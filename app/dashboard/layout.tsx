@@ -2,101 +2,126 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Truck, 
-  Map, 
-  Settings, 
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  LayoutDashboard,
+  Users,
+  Truck,
+  Map,
+  Settings,
   LogOut,
   Bell,
-  Search
+  Search,
+  ChevronRight,
 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { icon: Users, label: 'Usuarios', href: '/dashboard/usuarios' },
-  { icon: Truck, label: 'Flota', href: '/dashboard/flota' },
-  { icon: Map, label: 'Rutas', href: '/dashboard/rutas' },
-  { icon: Settings, label: 'Configuración', href: '/dashboard/configuracion' },
+  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard', color: 'text-sky-400' },
+  { icon: Users, label: 'Usuarios', href: '/dashboard/usuarios', color: 'text-violet-400' },
+  { icon: Truck, label: 'Flota', href: '/dashboard/flota', color: 'text-teal-400' },
+  { icon: Map, label: 'Rutas', href: '/dashboard/rutas', color: 'text-amber-400' },
+  { icon: Settings, label: 'Configuración', href: '/dashboard/configuracion', color: 'text-slate-400' },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+  };
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-background overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-border bg-card flex flex-col">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Fleet<span className="text-primary">IQ</span></h1>
+      <aside className="w-64 flex flex-col shrink-0 border-r border-border/50"
+        style={{ background: 'oklch(0.168 0.042 265.755)' }}>
+        {/* Logo */}
+        <div className="px-6 py-5 flex items-center gap-2 border-b border-border/50">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center shrink-0">
+            <Truck className="w-4 h-4 text-primary-foreground" />
+          </div>
+          <span className="font-bold text-lg tracking-tight">
+            Fleet<span className="text-primary">IQ</span>
+          </span>
         </div>
-        
-        <nav className="flex-1 px-4 space-y-2 mt-4">
+
+        {/* Nav items */}
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {sidebarItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-full transition-colors ${
-                  isActive 
-                    ? 'bg-primary text-primary-foreground font-medium shadow-sm' 
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 ${
+                  isActive
+                    ? 'bg-primary/15 text-primary font-medium'
+                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
                 }`}
               >
-                <item.icon className="w-5 h-5" />
-                <span>{item.label}</span>
+                <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-primary' : item.color}`} />
+                <span className="text-sm">{item.label}</span>
+                {isActive && (
+                  <ChevronRight className="w-4 h-4 ml-auto text-primary/60" />
+                )}
               </Link>
-            )
+            );
           })}
         </nav>
-        
-        <div className="p-4 mt-auto">
-          <button className="flex w-full items-center gap-3 px-4 py-3 text-muted-foreground hover:bg-muted hover:text-foreground rounded-full transition-colors">
-            <LogOut className="w-5 h-5" />
+
+        {/* Logout */}
+        <div className="p-3 border-t border-border/50">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 px-3 py-2.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-xl transition-all duration-150 text-sm"
+          >
+            <LogOut className="w-5 h-5 shrink-0" />
             <span>Cerrar sesión</span>
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-20 border-b border-border bg-card flex items-center justify-between px-8">
-          <div className="relative w-96">
+        <header className="h-16 flex items-center justify-between px-6 border-b border-border/50 bg-card/50 backdrop-blur-sm shrink-0">
+          <div className="relative w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              type="text" 
-              placeholder="Buscar..." 
-              className="pl-10 rounded-full bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary/50" 
+            <Input
+              type="text"
+              placeholder="Buscar..."
+              className="pl-10 h-9 rounded-full bg-muted/50 border-border/50 text-sm focus-visible:border-primary/50 focus-visible:ring-primary/20"
             />
           </div>
-          
-          <div className="flex items-center gap-4">
-            <button className="p-2 relative text-muted-foreground hover:bg-muted rounded-full transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-2 w-2 h-2 bg-primary rounded-full"></span>
+
+          <div className="flex items-center gap-3">
+            {/* Notification bell */}
+            <button className="relative w-9 h-9 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors">
+              <Bell className="w-4.5 h-4.5" />
+              <span className="absolute top-1.5 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-background" />
             </button>
-            <div className="h-8 w-px bg-border mx-2"></div>
-            <div className="flex items-center gap-3">
+
+            <div className="w-px h-5 bg-border/70" />
+
+            {/* User */}
+            <div className="flex items-center gap-2.5">
               <div className="text-right hidden md:block">
-                <p className="text-sm font-medium text-foreground">Admin Usuario</p>
-                <p className="text-xs text-muted-foreground">Sede Central</p>
+                <p className="text-sm font-medium leading-tight">Admin</p>
+                <p className="text-xs text-muted-foreground leading-tight">Administrador</p>
               </div>
-              <Avatar>
-                <AvatarImage src="" />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium">AU</AvatarFallback>
+              <Avatar className="w-8 h-8 ring-2 ring-primary/30">
+                <AvatarFallback className="bg-primary/20 text-primary text-xs font-bold">A</AvatarFallback>
               </Avatar>
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-8 bg-background">
+        {/* Page content */}
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">
           {children}
         </main>
       </div>

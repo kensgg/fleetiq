@@ -1,15 +1,15 @@
 "use client"
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Truck, Loader2, Eye, EyeOff, ArrowRight, Zap } from 'lucide-react';
+import { Truck, Loader2, Eye, EyeOff, ArrowRight, Activity, Shield, BarChart3 } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const justRegistered = searchParams.get('registered') === 'true';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -40,124 +40,246 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full max-w-4xl flex rounded-3xl overflow-hidden glass-card glow-primary">
-      {/* Panel izquierdo: branding */}
-      <div className="hidden md:flex flex-col w-1/2 p-10 justify-between"
-        style={{
-          background: 'linear-gradient(135deg, oklch(0.746 0.16 232.661 / 20%) 0%, oklch(0.702 0.183 293.541 / 10%) 50%, oklch(0.777 0.152 181.912 / 15%) 100%)'
-        }}
+    <div className="min-h-screen flex">
+      {/* ── Panel lateral de marca (40%) ── */}
+      <aside
+        className="auth-brand-panel relative hidden lg:flex flex-col justify-between p-10 xl:p-12"
+        style={{ width: '40%', minWidth: 380 }}
       >
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <Truck className="w-4 h-4 text-primary-foreground" />
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <div
+            className="flex items-center justify-center rounded-lg"
+            style={{
+              width: 36,
+              height: 36,
+              background: 'var(--auth-accent)',
+            }}
+          >
+            <Truck className="w-[18px] h-[18px] text-white" />
           </div>
-          <span className="font-bold text-lg tracking-tight">Fleet<span className="text-primary">IQ</span></span>
+          <span
+            className="text-lg font-bold tracking-tight"
+            style={{ color: 'var(--auth-text-primary)' }}
+          >
+            Fleet
+            <span style={{ color: 'var(--auth-accent)' }}>IQ</span>
+          </span>
         </div>
 
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold leading-tight">
+        {/* Contenido central */}
+        <div className="space-y-8">
+          {/* Headline serif */}
+          <div>
+            <h2
+              className="font-serif leading-tight"
+              style={{
+                fontFamily: 'var(--font-dm-serif), "DM Serif Display", Georgia, serif',
+                fontSize: 'clamp(28px, 3vw, 40px)',
+                color: 'var(--auth-text-primary)',
+                letterSpacing: '-0.01em',
+              }}
+            >
               Gestiona tu flota
               <br />
-              <span className="text-primary">con inteligencia.</span>
+              <span style={{ color: 'var(--auth-accent)' }}>con inteligencia.</span>
             </h2>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              Monitorea rutas, conductores y vehículos desde un solo lugar. Decisiones más rápidas, operaciones más eficientes.
+            <p
+              className="mt-3 leading-relaxed"
+              style={{
+                color: 'var(--auth-text-secondary)',
+                fontSize: 14,
+                maxWidth: 320,
+              }}
+            >
+              Monitorea rutas, conductores y vehículos desde un solo lugar.
+              Decisiones más rápidas, operaciones más eficientes.
             </p>
           </div>
 
-          {/* Feature pills */}
-          <div className="flex flex-col gap-2">
+          {/* Bullets de valor */}
+          <div className="space-y-4">
             {[
-              { icon: Zap, text: 'Alertas en tiempo real' },
-              { icon: Truck, text: 'Gestión de flota completa' },
-              { icon: ArrowRight, text: 'Multi-sede y multi-rol' },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-2 text-xs text-muted-foreground">
-                <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                  <Icon className="w-3 h-3 text-primary" />
+              { icon: Activity, title: 'Monitoreo en tiempo real', desc: 'Estado de tu flota al instante' },
+              { icon: Shield, title: 'Control de acceso por roles', desc: 'Multi-sede, multi-usuario' },
+              { icon: BarChart3, title: 'Reportes operativos', desc: 'Datos para tomar mejores decisiones' },
+            ].map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="auth-bullet">
+                <div className="auth-bullet-icon">
+                  <Icon className="w-4 h-4" />
                 </div>
-                {text}
+                <div>
+                  <span
+                    className="block text-[13px] font-medium"
+                    style={{ color: 'var(--auth-text-primary)' }}
+                  >
+                    {title}
+                  </span>
+                  <span className="block text-xs" style={{ color: 'var(--auth-text-tertiary)' }}>
+                    {desc}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground/60">© 2025 FleetIQ. Todos los derechos reservados.</p>
-      </div>
+        {/* Copyright */}
+        <p className="text-xs" style={{ color: 'var(--auth-text-tertiary)' }}>
+          © {new Date().getFullYear()} FleetIQ · 3 Guerras
+        </p>
+      </aside>
 
-      {/* Panel derecho: formulario */}
-      <div className="flex-1 p-8 md:p-10 flex flex-col justify-center">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold mb-1">Bienvenido de nuevo</h1>
-          <p className="text-muted-foreground text-sm">Ingresa tus credenciales para continuar</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-medium">Correo electrónico</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="correo@empresa.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-11 bg-muted/50 border-border/50 focus-visible:border-primary/50 focus-visible:ring-primary/20 rounded-xl"
-            />
+      {/* ── Panel de formulario (60%) ── */}
+      <main
+        className="flex-1 flex items-center justify-start"
+        style={{ background: 'var(--auth-bg-base)' }}
+      >
+        <div
+          className="auth-animate-in w-full max-w-[420px] mx-auto lg:mx-0 px-6 sm:px-8 lg:pl-16 xl:pl-24"
+        >
+          {/* Logo móvil */}
+          <div className="flex lg:hidden items-center gap-3 mb-10">
+            <div
+              className="flex items-center justify-center rounded-lg"
+              style={{
+                width: 36,
+                height: 36,
+                background: 'var(--auth-accent)',
+              }}
+            >
+              <Truck className="w-[18px] h-[18px] text-white" />
+            </div>
+            <span
+              className="text-lg font-bold tracking-tight"
+              style={{ color: 'var(--auth-text-primary)' }}
+            >
+              Fleet<span style={{ color: 'var(--auth-accent)' }}>IQ</span>
+            </span>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-sm font-medium">Contraseña</Label>
-              <Link href="/recovery" className="text-xs text-primary hover:text-primary/80 transition-colors">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-11 pr-10 bg-muted/50 border-border/50 focus-visible:border-primary/50 focus-visible:ring-primary/20 rounded-xl"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
+          {/* Headline */}
+          <h1
+            style={{
+              fontFamily: 'var(--font-dm-serif), "DM Serif Display", Georgia, serif',
+              fontSize: 32,
+              color: 'var(--auth-text-primary)',
+              letterSpacing: '-0.01em',
+              lineHeight: 1.15,
+            }}
+          >
+            Bienvenido de nuevo
+          </h1>
+          <p
+            className="mt-2 mb-8"
+            style={{ color: 'var(--auth-text-secondary)', fontSize: 14 }}
+          >
+            Ingresa tus credenciales para continuar
+          </p>
 
-          {error && (
-            <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-xl">
-              {error}
+          {/* Mensaje de registro exitoso */}
+          {justRegistered && (
+            <div className="auth-success-msg mb-6">
+              Cuenta creada exitosamente. Inicia sesión para continuar.
             </div>
           )}
 
-          <Button
-            type="submit"
-            className="w-full h-11 font-semibold shadow-lg shadow-primary/25 rounded-xl"
-            disabled={loading}
-          >
-            {loading
-              ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Iniciando sesión...</>
-              : <><span>Iniciar sesión</span><ArrowRight className="w-4 h-4 ml-2" /></>
-            }
-          </Button>
-        </form>
+          {/* Formulario */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div>
+              <label htmlFor="login-email" className="auth-label">
+                Correo electrónico
+              </label>
+              <input
+                id="login-email"
+                type="email"
+                placeholder="correo@empresa.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="auth-input"
+                autoComplete="email"
+              />
+            </div>
 
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          ¿No tienes una cuenta?{' '}
-          <Link href="/register" className="font-medium text-primary hover:text-primary/80 transition-colors">
-            Regístrate aquí
-          </Link>
-        </p>
-      </div>
+            {/* Password */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="login-password" className="auth-label" style={{ marginBottom: 0 }}>
+                  Contraseña
+                </label>
+                <Link
+                  href="/recovery"
+                  className="auth-link"
+                  style={{ fontSize: 12 }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="auth-input"
+                  style={{ paddingRight: 44 }}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
+                  style={{ color: 'var(--auth-text-tertiary)' }}
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPassword
+                    ? <EyeOff className="w-[18px] h-[18px]" />
+                    : <Eye className="w-[18px] h-[18px]" />
+                  }
+                </button>
+              </div>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="auth-error-msg">{error}</div>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="auth-btn"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-[18px] h-[18px] animate-spin" />
+                  <span>Iniciando sesión…</span>
+                </>
+              ) : (
+                <>
+                  <span>Iniciar sesión</span>
+                  <ArrowRight className="w-[18px] h-[18px]" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Link a registro */}
+          <p
+            className="mt-8 text-center lg:text-left"
+            style={{ color: 'var(--auth-text-secondary)', fontSize: 13 }}
+          >
+            ¿No tienes una cuenta?{' '}
+            <Link href="/register" className="auth-link">
+              Regístrate aquí
+            </Link>
+          </p>
+        </div>
+      </main>
     </div>
   );
 }

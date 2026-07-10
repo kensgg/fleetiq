@@ -1,0 +1,249 @@
+Este es el esquema completo que cubre los RF-01 a RF-24 y los RG-01 a RG-07, con tablas
+"stub" ya preparadas para IA y n8n (sin lógica, solo estructura y config).
+
+sql
+-- =========================================================
+-- FleetIQ - Esquema de Base de Datos (Supabase / PostgreSQL)
+-- =========================================================
+
+-- Extensiones útiles
+create extension if not exists "uuid-ossp";
+create extension if not exists pgcrypto;
+
+-- =========================
+-- ENUMS
+-- =========================
+create type rol_usuario as enum (
+  'administrador',
+  'gerente_operaciones',
+  'supervisor',
+  'conductor',
+  'capturista'
+);
+
+create type estado_camion as enum (
+  'disponible',
+  'en_ruta',
+  'mantenimiento',
+  'fuera_servicio'
+);
+
+create type estado_ruta as enum (
+  'pendiente',
+  'en_curso',
+  'completada',
+  'cancelada'
+);
+
+create type tipo_documento_camion as enum (
+  'tarjeta_circulacion',
+  'seguro',
+  'verificacion',
+  'permiso_sct'
+);
+
+create type tipo_incidencia as enum (
+  'accidente',
+  'retraso',
+  'falla_mecanica',
+  'otro'
+);
+
+create type prioridad_alerta as enum ('alta', 'media', 'baja');
+
+-- =========================
+-- MULTI-TENANT: SEDES
+-- =========================
+create table sedes (
+  id uuid primary key default uuid_generate_v4(),
+  nombre text not null,
+  direccion text,
+  activo boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- =========================
+-- PERFILES DE USUARIO (extiende auth.users de Supabase)
+-- =========================
+create table profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  sede_id uuid references sedes(id) on delete restrict,
+  nombre_completo text not null,
+  rol rol_usuario not null,
+  estado boolean not null default true, -- activo/inactivo
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- =========================
+-- CAMIONES
+-- =========================
+create table camiones (
+  id uuid primary key default uuid_generate_v4(),
+  sede_id uuid not null references sedes(id) on delete restrict,
+  numero_unidad text not null,
+  marca text not null,
+  modelo text not null,
+  anio int not null,
+  placas text not null,
+  numero_serie text not null,
+  tipo_carga text,
+  estado estado_camion not null default 'disponible',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (sede_id, numero_unidad)
+);
+
+-- =========================
+-- CONDUCTORES
+-- =========================
+create table conductores (
+  id uuid primary key default uuid_generate_v4(),
+  sede_id uuid not null references sedes(id) on delete restrict,
+  profile_id uuid references profiles(id) on delete set null, -- si tiene acceso al sistema
+  nombre_completo text not null,
+  licencia_numero text not null,
+  tipo_licencia text not null,
+  licencia_vigencia date not null,
+  estado boolean not null default true, -- activo/inactivo
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Historial de asignaciones conductor-camión (RF-10)
+create table asignaciones_conductor_camion (
+  id uuid primary key default uuid_generate_v4(),
+  camion_id uuid not null references camiones(id) on delete cascade,
+  conductor_id uuid not null references conductores(id) on delete cascade,
+  fecha_inicio timestamptz not null default now(),
+  fecha_fin timestamptz,
+  activo boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- Documentos digitales de cada unidad (RF-11)
+create table documentos_camion (
+  id uuid primary key default uuid_generate_v4(),
+  camion_id uuid not null references camiones(id) on delete cascade,
+  tipo_documento tipo_documento_camion not null,
+  archivo_url text,
+  fecha_vencimiento date,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Historial de mantenimientos (RF-12, RF-17)
+create table mantenimientos (
+  id uuid primary key default uuid_generate_v4(),
+  camion_id uuid not null references camiones(id) on delete cascade,
+  fecha date not null,
+  tipo text not null,
+  costo numeric(12,2) not null default 0,
+  proveedor text,
+  kilometraje int,
+  created_at timestamptz not null default now()
+);
+
+-- =========================
+-- RUTAS Y LOGÍSTICA
+-- =========================
+create table rutas (
+  id uuid primary key default uuid_generate_v4(),
+  sede_id uuid not null references sedes(id) on delete restrict,
+  camion_id uuid not null references camiones(id) on delete restrict,
+  conductor_id uuid not null references conductores(id) on delete restrict,
+  origen text not null,
+  destino text not null,
+  puntos_intermedios jsonb default '[]'::jsonb,
+  fecha_estimada timestamptz not null,
+  estado estado_ruta not null default 'pendiente',
+  creado_por uuid references profiles(id),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- Incidencias en ruta (RF-15)
+create table incidencias (
+  id uuid primary key default uuid_generate_v4(),
+  ruta_id uuid not null references rutas(id) on delete cascade,
+  tipo tipo_incidencia not null,
+  descripcion text not null,
+  evidencia_url text,
+  reportado_por uuid references profiles(id),
+  created_at timestamptz not null default now()
+);
+
+-- =========================
+-- NOTIFICACIONES (RF-16, RF-17, RF-18)
+-- =========================
+create table notificaciones (
+  id uuid primary key default uuid_generate_v4(),
+  usuario_id uuid not null references profiles(id) on delete cascade,
+  titulo text not null,
+  mensaje text not null,
+  prioridad prioridad_alerta not null default 'media',
+  entidad_tipo text, -- ej. 'camion', 'ruta', 'documento', 'mantenimiento'
+  entidad_id uuid,
+  leida boolean not null default false,
+  enviado_por_correo boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+-- =========================
+-- REPORTES (log de generación, RF-19 a RF-21)
+-- =========================
+create table reportes_generados (
+  id uuid primary key default uuid_generate_v4(),
+  sede_id uuid not null references sedes(id),
+  tipo text not null, -- 'combustible', 'km_recorridos', 'mantenimiento', 'eficiencia_rutas'
+  filtros jsonb default '{}'::jsonb,
+  formato text not null, -- 'pdf' | 'xlsx'
+  generado_por uuid references profiles(id),
+  archivo_url text,
+  created_at timestamptz not null default now()
+);
+
+-- =========================
+-- STUB: CHATBOT / IA (RF-22 a RF-24) — solo estructura, sin lógica todavía
+-- =========================
+create table chatbot_conversaciones (
+  id uuid primary key default uuid_generate_v4(),
+  usuario_id uuid not null references profiles(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create table chatbot_mensajes (
+  id uuid primary key default uuid_generate_v4(),
+  conversacion_id uuid not null references chatbot_conversaciones(id) on delete cascade,
+  rol text not null check (rol in ('usuario', 'asistente')),
+  contenido text not null,
+  created_at timestamptz not null default now()
+);
+
+-- =========================
+-- STUB: CONFIGURACIÓN DE INTEGRACIONES (IA / n8n) — sin activar aún
+-- =========================
+create table integraciones_config (
+  id uuid primary key default uuid_generate_v4(),
+  nombre text not null, -- ej. 'n8n_webhook_mantenimiento', 'ia_chatbot_endpoint'
+  tipo text not null,   -- 'n8n' | 'ia' | 'otro'
+  endpoint_url text,
+  activo boolean not null default false,
+  config jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+-- =========================
+-- ÍNDICES BÁSICOS
+-- =========================
+create index idx_camiones_sede on camiones(sede_id);
+create index idx_conductores_sede on conductores(sede_id);
+create index idx_rutas_sede on rutas(sede_id);
+create index idx_rutas_estado on rutas(estado);
+create index idx_notificaciones_usuario on notificaciones(usuario_id, leida);
+create index idx_mantenimientos_camion on mantenimientos(camion_id);
+
+
+---

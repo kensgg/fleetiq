@@ -1,12 +1,11 @@
 "use client"
 
-import React, { Suspense, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Truck, Loader2, Eye, EyeOff, ArrowRight, Activity, Shield, BarChart3 } from 'lucide-react';
 
-// ── Inner component — uses useSearchParams(), must be inside <Suspense> ──
-function LoginForm() {
+export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get('registered') === 'true';
@@ -283,14 +282,5 @@ function LoginForm() {
         </div>
       </main>
     </div>
-  );
-}
-
-// ── Page export — wraps LoginForm in Suspense (required for useSearchParams) ──
-export default function LoginPage() {
-  return (
-    <Suspense fallback={null}>
-      <LoginForm />
-    </Suspense>
   );
 }

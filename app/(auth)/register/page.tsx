@@ -4,6 +4,17 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Truck, Loader2, Eye, EyeOff, ArrowRight, Activity, Shield, BarChart3 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { AVISO_PRIVACIDAD, POLITICA_PRIVACIDAD } from '@/lib/legal/documentosPrivacidad';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,6 +30,9 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [openAviso, setOpenAviso] = useState(false);
+  const [openPolitica, setOpenPolitica] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -27,6 +41,11 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!aceptaTerminos) {
+      setError('Debes aceptar el Aviso de Privacidad y la Política de Privacidad para continuar.');
+      return;
+    }
 
     // Validación client-side: contraseñas coinciden
     if (formData.password !== confirmPassword) {
@@ -337,6 +356,38 @@ export default function RegisterPage() {
               )}
             </div>
 
+            {/* Checkbox Acepta Términos */}
+            <div className="flex items-start gap-3 text-xs sm:text-[13px] leading-relaxed" style={{ color: 'var(--auth-text-secondary)' }}>
+              <input
+                id="register-acepta-terminos"
+                name="aceptaTerminos"
+                type="checkbox"
+                checked={aceptaTerminos}
+                onChange={(e) => setAceptaTerminos(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-zinc-800 bg-zinc-800 text-[var(--auth-accent)] focus:ring-[var(--auth-accent)] cursor-pointer accent-[var(--auth-accent)]"
+              />
+              <label htmlFor="register-acepta-terminos" className="cursor-pointer select-none">
+                He leído y acepto el{' '}
+                <button
+                  type="button"
+                  onClick={() => setOpenAviso(true)}
+                  className="underline cursor-pointer hover:opacity-80 transition-opacity font-semibold inline"
+                  style={{ color: 'var(--auth-accent)' }}
+                >
+                  Aviso de Privacidad
+                </button>{' '}
+                y la{' '}
+                <button
+                  type="button"
+                  onClick={() => setOpenPolitica(true)}
+                  className="underline cursor-pointer hover:opacity-80 transition-opacity font-semibold inline"
+                  style={{ color: 'var(--auth-accent)' }}
+                >
+                  Política de Privacidad
+                </button>
+              </label>
+            </div>
+
             {/* Error */}
             {error && (
               <div className="auth-error-msg">{error}</div>
@@ -346,7 +397,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               className="auth-btn"
-              disabled={loading}
+              disabled={loading || !aceptaTerminos}
             >
               {loading ? (
                 <>
@@ -374,6 +425,53 @@ export default function RegisterPage() {
           </p>
         </div>
       </main>
+
+      {/* Diálogos de Privacidad */}
+      <Dialog open={openAviso} onOpenChange={setOpenAviso}>
+        <DialogContent className="sm:max-w-xl md:max-w-2xl max-h-[85vh] flex flex-col p-6 rounded-xl border border-zinc-800 bg-[#18181B] text-zinc-200">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-lg font-bold text-zinc-100">
+              Aviso de Privacidad
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Aviso de Privacidad oficial para la protección de datos personales de FleetIQ conforme a la LFPDPPP.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4 text-[13px] leading-relaxed text-zinc-400 whitespace-pre-wrap select-text">
+            {AVISO_PRIVACIDAD}
+          </div>
+          <DialogFooter className="mt-4 pt-4 border-t border-zinc-800">
+            <DialogClose asChild>
+              <Button type="button" variant="outline" className="w-full sm:w-auto cursor-pointer">
+                Entendido
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openPolitica} onOpenChange={setOpenPolitica}>
+        <DialogContent className="sm:max-w-xl md:max-w-2xl max-h-[85vh] flex flex-col p-6 rounded-xl border border-zinc-800 bg-[#18181B] text-zinc-200">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-lg font-bold text-zinc-100">
+              Política de Privacidad
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Política de Privacidad y seguridad de la información recopilada en FleetIQ.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4 text-[13px] leading-relaxed text-zinc-400 whitespace-pre-wrap select-text">
+            {POLITICA_PRIVACIDAD}
+          </div>
+          <DialogFooter className="mt-4 pt-4 border-t border-zinc-800">
+            <DialogClose asChild>
+              <Button type="button" variant="outline" className="w-full sm:w-auto cursor-pointer">
+                Entendido
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,16 +1,15 @@
+import { z } from 'zod';
+
 // ─────────────────────────────────────────────────────────────
-// Conductor (RF-09)
+// Crear asignación conductor-camión
 // ─────────────────────────────────────────────────────────────
 
-export interface Conductor {
-  id: string;
-  sede_id: string;
-  profile_id: string | null;
-  nombre_completo: string;
-  licencia_numero: string;
-  tipo_licencia: string;
-  licencia_vigencia: string;
-  estado: boolean;
-  created_at: string;
-  updated_at: string;
-}
+export const createAsignacionSchema = z.object({
+  camion_id: z
+    .string()
+    .uuid('El camion_id debe ser un UUID válido'),
+
+  conductor_id: z
+    .string()
+    .uuid('El conductor_id debe ser un UUID válido'),
+});

@@ -40,8 +40,25 @@ export async function proxy(request: NextRequest) {
 
   // IMPORTANTE: No remover esta línea.
   // Provoca que Supabase refresque la sesión si el token está por expirar.
-  // El resultado se descarta intencionalmente — el efecto secundario son las cookies.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  // ── Protección de rutas ───────────────────────────────────────────────
+  // Usuario NO autenticado intenta acceder al dashboard → redirigir a login
+  if (!user && pathname.startsWith('/dashboard')) {
+    const loginUrl = new URL('/login', request.url);
+    loginUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Usuario autenticado intenta acceder a login/register → redirigir al dashboard
+  // COMENTADO: Evita un loop infinito si el perfil de DB fue borrado pero la sesión Auth sigue viva
+  // if (user && (pathname === '/login' || pathname === '/register')) {
+  //   return NextResponse.redirect(new URL('/dashboard', request.url));
+  // }
 
   return supabaseResponse;
 }

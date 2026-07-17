@@ -1,18 +1,11 @@
 "use client"
 
-import React, { useState, Suspense } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Truck, Loader2, Eye, EyeOff, ArrowRight, Activity, Shield, BarChart3 } from 'lucide-react';
 
-export default function LoginPage() {
-  return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
-  );
-}
-
+// ── Inner component — uses useSearchParams(), must be inside <Suspense> ──
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -39,7 +32,8 @@ function LoginForm() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
 
-      router.push('/dashboard/usuarios');
+      const redirectTo = searchParams.get('redirect') || '/dashboard';
+      router.push(redirectTo);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -289,5 +283,14 @@ function LoginForm() {
         </div>
       </main>
     </div>
+  );
+}
+
+// ── Page export — wraps LoginForm in Suspense (required for useSearchParams) ──
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

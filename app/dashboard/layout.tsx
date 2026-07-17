@@ -25,29 +25,34 @@ export default async function DashboardLayout({
   } = await supabase.auth.getUser();
 
   if (authError || !authUser) {
+    console.error("Dashboard layout: No auth session found", authError);
     redirect('/login');
   }
 
   // ── 2. Fetch profile ──
-  const { data: profile, error: profileError } = await supabase
+  // Usamos el admin client para evitar problemas con RLS si no están configuradas las políticas aún
+  const admin = (await import('@/lib/supabase/admin')).createAdminClient();
+  const { data: profile, error: profileError } = await admin
     .from('profiles')
     .select('id, nombre_completo, rol, sede_id, estado')
     .eq('id', authUser.id)
     .single();
 
   if (profileError || !profile) {
+    console.error("Dashboard layout: Profile not found for user", authUser.id, profileError);
     redirect('/login');
   }
 
   // If user is deactivated, redirect to login
   if (!profile.estado) {
+    console.error("Dashboard layout: User is deactivated", profile.id);
     redirect('/login');
   }
 
   // ── 3. Fetch sede name ──
   let sedeNombre: string | null = null;
   if (profile.sede_id) {
-    const { data: sede } = await supabase
+    const { data: sede } = await admin
       .from('sedes')
       .select('nombre')
       .eq('id', profile.sede_id)

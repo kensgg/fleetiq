@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import {
   Users, UserCheck, UserX, MoreVertical, Plus, Edit, Trash, Shield,
-  Activity, RefreshCw
+  Activity, RefreshCw, UserCog,
 } from 'lucide-react';
 
 type RolUsuario = 'administrador' | 'gerente_operaciones' | 'supervisor' | 'conductor' | 'capturista';
@@ -22,18 +22,18 @@ type UserProfile = {
 };
 
 const ROL_CONFIG: Record<RolUsuario, { label: string; className: string }> = {
-  administrador:        { label: 'Admin',    className: 'bg-sky-500/15 text-sky-400 border-sky-500/30' },
-  gerente_operaciones:  { label: 'Gerente',  className: 'bg-violet-500/15 text-violet-400 border-violet-500/30' },
-  supervisor:           { label: 'Supervisor',className: 'bg-teal-500/15 text-teal-400 border-teal-500/30' },
-  conductor:            { label: 'Conductor',className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
-  capturista:           { label: 'Capturista',className: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
+  administrador:        { label: 'Admin',     className: 'bg-primary/15 text-primary border-primary/30' },
+  gerente_operaciones:  { label: 'Gerente',   className: 'bg-teal-500/15 text-teal-400 border-teal-500/30' },
+  supervisor:           { label: 'Supervisor', className: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
+  conductor:            { label: 'Conductor',  className: 'bg-violet-500/15 text-violet-400 border-violet-500/30' },
+  capturista:           { label: 'Capturista', className: 'bg-rose-500/15 text-rose-400 border-rose-500/30' },
 };
 
 const AVATAR_COLORS = [
-  'bg-sky-500/20 text-sky-400',
-  'bg-violet-500/20 text-violet-400',
+  'bg-primary/20 text-primary',
   'bg-teal-500/20 text-teal-400',
   'bg-amber-500/20 text-amber-400',
+  'bg-violet-500/20 text-violet-400',
   'bg-rose-500/20 text-rose-400',
 ];
 
@@ -79,9 +79,9 @@ export default function UsuariosPage() {
       label: 'Total Usuarios',
       value: users.length,
       icon: Users,
-      iconBg: 'bg-sky-500/15',
-      iconColor: 'text-sky-400',
-      glow: 'shadow-sky-500/10',
+      iconBg: 'bg-primary/15',
+      iconColor: 'text-primary',
+      glow: 'shadow-primary/10',
     },
     {
       label: 'Activos',
@@ -107,7 +107,7 @@ export default function UsuariosPage() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <Users className="w-5 h-5 text-violet-400" />
+            <UserCog className="w-5 h-5 text-primary" />
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Gestión</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Usuarios</h1>
@@ -269,9 +269,9 @@ export default function UsuariosPage() {
                               <MoreVertical className="w-4 h-4 text-muted-foreground" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-44 rounded-xl border-border/50 bg-card">
+                          <DropdownMenuContent align="end" className="w-44 rounded-xl border-border/50 bg-popover">
                             <DropdownMenuItem className="cursor-pointer rounded-lg text-sm gap-2">
-                              <Edit className="w-4 h-4 text-sky-400" /> Editar usuario
+                              <Edit className="w-4 h-4 text-primary" /> Editar usuario
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="cursor-pointer rounded-lg text-sm gap-2"

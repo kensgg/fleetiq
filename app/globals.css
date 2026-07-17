@@ -49,93 +49,99 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   FLEETIQ — Design System Tokens (Naranja / Dark Theme)
+   Primary: #E2793D (naranja FleetIQ)
+   Background: #0A0A0A (casi negro)
+   ───────────────────────────────────────────────────────────── */
+
 :root {
-  /* Fondo: azul navy muy oscuro (#0F172A Slate-900) */
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.948 0.006 264.531);
+  /* Fondo: negro casi puro */
+  --background: #0A0A0A;
+  --foreground: #F5F0EB;
 
-  /* Tarjetas: azul navy medio (#1E293B Slate-800) */
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.948 0.006 264.531);
+  /* Tarjetas: gris muy oscuro */
+  --card: #141416;
+  --card-foreground: #F5F0EB;
 
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.948 0.006 264.531);
+  --popover: #18181B;
+  --popover-foreground: #F5F0EB;
 
-  /* Color primario: Azul cielo eléctrico (#38BDF8 sky-400) */
-  --primary: oklch(0.746 0.16 232.661);
-  --primary-foreground: oklch(0.129 0.042 264.695);
+  /* Color primario: Naranja FleetIQ (#E2793D) */
+  --primary: #E2793D;
+  --primary-foreground: #ffffff;
 
-  /* Color secundario: Turquesa/Teal (#2DD4BF) */
-  --secondary: oklch(0.777 0.152 181.912);
-  --secondary-foreground: oklch(0.129 0.042 264.695);
+  /* Secundario: gris oscuro sutil */
+  --secondary: #1E1E22;
+  --secondary-foreground: #F5F0EB;
 
-  /* Muted azulado oscuro */
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.636 0.024 264.542);
+  /* Muted: gris oscuro */
+  --muted: #1E1E22;
+  --muted-foreground: #8A8A8D;
 
-  /* Accent: Púrpura brillante (#A78BFA violet-400) */
-  --accent: oklch(0.702 0.183 293.541);
-  --accent-foreground: oklch(0.129 0.042 264.695);
+  /* Accent: naranja translúcido para hovers y fondos sutiles */
+  --accent: rgba(226, 121, 61, 0.12);
+  --accent-foreground: #E2793D;
 
-  --destructive: oklch(0.637 0.237 25.331);
-  --border: oklch(0.279 0.041 260.031);
-  --input: oklch(0.279 0.041 260.031);
-  --ring: oklch(0.746 0.16 232.661);
+  --destructive: #C45250;
+  --border: #2A2A2E;
+  --input: #2A2A2E;
+  --ring: #E2793D;
 
-  /* Chart colors: sky, teal, violet, amber, rose */
-  --chart-1: oklch(0.746 0.16 232.661);
-  --chart-2: oklch(0.777 0.152 181.912);
-  --chart-3: oklch(0.702 0.183 293.541);
-  --chart-4: oklch(0.795 0.184 86.047);
-  --chart-5: oklch(0.637 0.237 25.331);
+  /* Chart colors: naranja, teal, violet, amber, rose */
+  --chart-1: #E2793D;
+  --chart-2: #2DD4BF;
+  --chart-3: #A78BFA;
+  --chart-4: #FBBF24;
+  --chart-5: #FB7185;
 
-  /* Radio grande para tarjetas */
-  --radius: 1rem;
+  /* Radio base */
+  --radius: 0.75rem;
 
-  /* Sidebar: navy oscuro */
-  --sidebar: oklch(0.168 0.042 265.755);
-  --sidebar-foreground: oklch(0.948 0.006 264.531);
-  --sidebar-primary: oklch(0.746 0.16 232.661);
-  --sidebar-primary-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.948 0.006 264.531);
-  --sidebar-border: oklch(0.279 0.041 260.031);
-  --sidebar-ring: oklch(0.746 0.16 232.661);
+  /* Sidebar: negro puro */
+  --sidebar: #0E0E10;
+  --sidebar-foreground: #F5F0EB;
+  --sidebar-primary: #E2793D;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(226, 121, 61, 0.10);
+  --sidebar-accent-foreground: #E2793D;
+  --sidebar-border: #1E1E22;
+  --sidebar-ring: #E2793D;
 }
 
-/* Modo oscuro igual al claro ya que usamos tema oscuro */
+/* Dark mode = same (always dark) */
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.948 0.006 264.531);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.948 0.006 264.531);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.948 0.006 264.531);
-  --primary: oklch(0.746 0.16 232.661);
-  --primary-foreground: oklch(0.129 0.042 264.695);
-  --secondary: oklch(0.777 0.152 181.912);
-  --secondary-foreground: oklch(0.129 0.042 264.695);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.636 0.024 264.542);
-  --accent: oklch(0.702 0.183 293.541);
-  --accent-foreground: oklch(0.129 0.042 264.695);
-  --destructive: oklch(0.637 0.237 25.331);
-  --border: oklch(0.279 0.041 260.031);
-  --input: oklch(0.279 0.041 260.031);
-  --ring: oklch(0.746 0.16 232.661);
-  --chart-1: oklch(0.746 0.16 232.661);
-  --chart-2: oklch(0.777 0.152 181.912);
-  --chart-3: oklch(0.702 0.183 293.541);
-  --chart-4: oklch(0.795 0.184 86.047);
-  --chart-5: oklch(0.637 0.237 25.331);
-  --sidebar: oklch(0.168 0.042 265.755);
-  --sidebar-foreground: oklch(0.948 0.006 264.531);
-  --sidebar-primary: oklch(0.746 0.16 232.661);
-  --sidebar-primary-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.948 0.006 264.531);
-  --sidebar-border: oklch(0.279 0.041 260.031);
-  --sidebar-ring: oklch(0.746 0.16 232.661);
+  --background: #0A0A0A;
+  --foreground: #F5F0EB;
+  --card: #141416;
+  --card-foreground: #F5F0EB;
+  --popover: #18181B;
+  --popover-foreground: #F5F0EB;
+  --primary: #E2793D;
+  --primary-foreground: #ffffff;
+  --secondary: #1E1E22;
+  --secondary-foreground: #F5F0EB;
+  --muted: #1E1E22;
+  --muted-foreground: #8A8A8D;
+  --accent: rgba(226, 121, 61, 0.12);
+  --accent-foreground: #E2793D;
+  --destructive: #C45250;
+  --border: #2A2A2E;
+  --input: #2A2A2E;
+  --ring: #E2793D;
+  --chart-1: #E2793D;
+  --chart-2: #2DD4BF;
+  --chart-3: #A78BFA;
+  --chart-4: #FBBF24;
+  --chart-5: #FB7185;
+  --sidebar: #0E0E10;
+  --sidebar-foreground: #F5F0EB;
+  --sidebar-primary: #E2793D;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(226, 121, 61, 0.10);
+  --sidebar-accent-foreground: #E2793D;
+  --sidebar-border: #1E1E22;
+  --sidebar-ring: #E2793D;
 }
 
 @layer base {
@@ -357,14 +363,14 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--auth-bg-surface);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--auth-border);
+  background: var(--border);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--auth-text-tertiary);
+  background: #5A5A5D;
 }
 
 /* Animación sutil de entrada para los formularios */
@@ -381,4 +387,71 @@
 
 .auth-animate-in {
   animation: auth-fade-in 0.4s ease-out;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DASHBOARD — Utilidades del layout
+   ───────────────────────────────────────────────────────────── */
+
+/* Sidebar nav item active indicator */
+.dash-nav-active {
+  background: rgba(226, 121, 61, 0.10);
+  color: #E2793D;
+  border-left: 3px solid #E2793D;
+}
+
+/* Sidebar nav item hover */
+.dash-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 0 8px 8px 0;
+  border-left: 3px solid transparent;
+  color: #8A8A8D;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.dash-nav-item:hover:not(.dash-nav-active) {
+  background: rgba(255, 255, 255, 0.04);
+  color: #F5F0EB;
+}
+
+/* Notification badge */
+.dash-notif-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #E2793D;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Page fade-in animation */
+@keyframes dash-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dash-page-in {
+  animation: dash-page-in 0.3s ease-out;
 }

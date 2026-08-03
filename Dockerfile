@@ -51,9 +51,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 USER nextjs
 
 # Next.js server — listen on all interfaces inside the container
-ENV PORT=3000
-ENV HOSTNAME=0.0.0.0
+ENV HOSTNAME="0.0.0.0"
 
+# El puerto será asignado dinámicamente por Railway mediante la variable process.env.PORT
+# Opcionalmente se expone el puerto 3000 para entorno local (docker-compose)
 EXPOSE 3000
 
 CMD ["node", "server.js"]

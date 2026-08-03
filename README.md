@@ -1,37 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FleetIQ - Deployment to Railway
 
-## Getting Started
+Este repositorio contiene la aplicación FleetIQ (Next.js 15 Fullstack), configurada y optimizada para ser desplegada en **Railway** utilizando **Docker**.
 
-First, run the development server:
+## Estructura del Proyecto
 
+El proyecto está construido con Next.js (App Router), lo que significa que **el frontend y el backend (API) están integrados en el mismo proyecto**. Esto simplifica el despliegue a un único servicio en Railway.
+
+- `app/`: Contiene la lógica del frontend y el backend (API routes).
+- `Dockerfile`: Archivo de configuración Docker multi-etapa optimizado para producción.
+- `railway.json`: Archivo de configuración de Railway para definir el comportamiento de construcción y despliegue.
+
+## Ejecución Local (Desarrollo)
+
+1. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+
+2. Configura las variables de entorno. Copia `.env.example` a `.env.local` y agrega tus credenciales:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+3. Inicia el servidor de desarrollo:
+   ```bash
+   npm run dev
+   ```
+
+## Ejecución con Docker (Local)
+
+Para probar la imagen de producción de Docker localmente:
+
+1. Construye la imagen (nota: debes pasar los argumentos de build si son requeridos):
+   ```bash
+   docker build --build-arg NEXT_PUBLIC_SUPABASE_URL=tu_url --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_key -t fleetiq-app .
+   ```
+
+2. Ejecuta el contenedor:
+   ```bash
+   docker run -p 3000:3000 --env-file .env.local fleetiq-app
+   ```
+   *Nota: La aplicación estará disponible en `http://localhost:3000`.*
+
+También puedes utilizar docker-compose:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker-compose up -d --build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Despliegue en Railway
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+El proyecto está listo para ser desplegado en Railway sin necesidad de configuraciones adicionales.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Pasos para desplegar:
+1. Sube este repositorio a tu cuenta de GitHub.
+2. Inicia sesión en [Railway](https://railway.app/).
+3. Crea un nuevo proyecto y selecciona **Deploy from GitHub repo**.
+4. Selecciona este repositorio (`fleetiq`).
+5. **Variables de Entorno**: Ve a la pestaña **Variables** en Railway y agrega todas las variables necesarias basándote en el archivo `.env.example`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `SUPABASE_JWKS_URL`
+6. Railway detectará automáticamente el archivo `Dockerfile` y `railway.json`, construirá la imagen y asignará un puerto dinámico (`process.env.PORT`) de forma automática.
+7. Opcional: Ve a la pestaña **Settings** > **Networking** y genera un dominio público.
 
-## Learn More
+## Variables de Entorno Requeridas
 
-To learn more about Next.js, take a look at the following resources:
+Consulta el archivo `.env.example` para ver la lista completa de variables requeridas. Es importante **no hacer commit de secretos al repositorio**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Posibles Problemas y Soluciones
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# fleetiq
+- **La compilación falla en Railway por variables no encontradas**: Next.js necesita que las variables con prefijo `NEXT_PUBLIC_` estén disponibles durante el proceso de **build**. Asegúrate de agregar las variables en la interfaz de Railway *antes* de que ocurra el primer build o re-despliega si falló.
+- **Error de puerto (Port bind error)**: Asegúrate de no tener `ENV PORT=3000` en el Dockerfile; el Dockerfile actual ha sido modificado para evitar fijar este puerto y usar la variable `$PORT` provista por Railway.
+- **La aplicación inicia pero las rutas del backend fallan**: Verifica que las variables del lado del servidor (como `SUPABASE_SERVICE_ROLE_KEY`) estén correctamente configuradas en Railway.

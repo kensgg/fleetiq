@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Truck, Loader2, Eye, EyeOff, ArrowRight, Activity, Shield, BarChart3 } from 'lucide-react';
 
-export default function LoginPage() {
+// ── Inner component — uses useSearchParams(), must be inside <Suspense> ──
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const justRegistered = searchParams.get('registered') === 'true';
@@ -33,8 +34,8 @@ export default function LoginPage() {
 
       const redirectTo = searchParams.get('redirect') || '/dashboard';
       router.push(redirectTo);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
     } finally {
       setLoading(false);
     }
@@ -282,5 +283,26 @@ export default function LoginPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// ── Page export — wraps LoginForm in Suspense (required for useSearchParams) ──
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: 'var(--auth-bg-base)' }}
+        >
+          <Loader2
+            className="w-8 h-8 animate-spin"
+            style={{ color: 'var(--auth-accent)' }}
+          />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

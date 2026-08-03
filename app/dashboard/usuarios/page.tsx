@@ -1,10 +1,9 @@
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import {
   Users, UserCheck, UserX, MoreVertical, Plus, Edit, Trash, Shield,
@@ -42,9 +41,7 @@ export default function UsuariosPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => { fetchUsers(); }, []);
-
-  const fetchUsers = async (isRefresh = false) => {
+  const fetchUsers = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true); else setLoading(true);
     try {
       const res = await fetch('/api/users');
@@ -56,7 +53,28 @@ export default function UsuariosPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/users')
+      .then((res) => res.json())
+      .then((json) => {
+        if (active && json.success) {
+          setUsers(json.data);
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          console.error(error);
+          setLoading(false);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {

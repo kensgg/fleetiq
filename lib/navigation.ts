@@ -23,12 +23,12 @@ export interface NavItem {
   href: string;
   /** Lucide icon component */
   icon: LucideIcon;
-  /** Roles that can see this item. Empty = visible to all authenticated users. */
+  /** Roles that can see this item. */
   allowedRoles: RolUsuario[];
 }
 
 // ─────────────────────────────────────────────────────────────
-// Helper constant — all roles (shorthand for "everyone")
+// Helper constant — all roles
 // ─────────────────────────────────────────────────────────────
 
 const ALL_ROLES: RolUsuario[] = [
@@ -40,7 +40,7 @@ const ALL_ROLES: RolUsuario[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-// Navigation items
+// Navigation items (Mapeados con la matriz real de roles)
 // ─────────────────────────────────────────────────────────────
 
 export const NAV_ITEMS: NavItem[] = [
@@ -48,11 +48,11 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Dashboard',
     href: '/dashboard',
     icon: LayoutDashboard,
-    allowedRoles: ALL_ROLES,
+    allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor'],
   },
   {
-    label: 'Camiones',
-    href: '/dashboard/camiones',
+    label: 'Vehículos',
+    href: '/dashboard/vehiculos',
     icon: Truck,
     allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor', 'capturista'],
   },
@@ -60,28 +60,28 @@ export const NAV_ITEMS: NavItem[] = [
     label: 'Conductores',
     href: '/dashboard/conductores',
     icon: Users,
-    allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor', 'capturista'],
+    allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor'], // Excluye capturista
   },
   {
     label: 'Rutas',
     href: '/dashboard/rutas',
     icon: Map,
-    allowedRoles: ALL_ROLES,
+    allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor', 'conductor'],
   },
   {
     label: 'Notificaciones',
     href: '/dashboard/notificaciones',
     icon: Bell,
-    allowedRoles: ALL_ROLES,
+    allowedRoles: ALL_ROLES, // Todos los roles
   },
   {
     label: 'Reportes',
     href: '/dashboard/reportes',
     icon: BarChart3,
-    allowedRoles: ['administrador', 'gerente_operaciones'],
+    allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor'],
   },
   {
-    label: 'Asistente IA',
+    label: 'Chatbot IA',
     href: '/dashboard/asistente',
     icon: Bot,
     allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor', 'conductor'],
@@ -93,7 +93,7 @@ export const NAV_ITEMS: NavItem[] = [
     allowedRoles: ['administrador'],
   },
   {
-    label: 'Configuración',
+    label: 'Integraciones',
     href: '/dashboard/configuracion',
     icon: Settings,
     allowedRoles: ['administrador'],

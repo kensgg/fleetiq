@@ -81,8 +81,8 @@ export default function RegisterPage() {
       if (!res.ok) throw new Error(data.message || 'Error al crear la cuenta');
 
       router.push('/login?registered=true');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Error al crear la cuenta');
     } finally {
       setLoading(false);
     }

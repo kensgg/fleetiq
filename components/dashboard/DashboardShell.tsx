@@ -23,6 +23,9 @@ import {
 import { getNavItemsForRole, type NavItem } from '@/lib/navigation';
 import type { RolUsuario } from '@/lib/types';
 import { ROL_LABELS } from '@/lib/constants';
+import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
+import { apiClient } from '@/lib/api/client';
+import { createClient } from '@/lib/supabase/client';
 
 // ─────────────────────────────────────────────────────────────
 // Types
@@ -49,19 +52,79 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
-  const navItems = getNavItemsForRole(user.rol);
-  const initials = user.nombre_completo
+  // Hook reactivo de sesión en cliente para actualizaciones en tiempo real
+  const { user: clientUser } = useCurrentUser();
+  const activeUser = clientUser || user;
+
+  // Carga e integraciones en tiempo real para notificaciones (Realtime + fallback Polling)
+  useEffect(() => {
+    let active = true;
+
+    // 1. Conteo inicial
+    apiClient.get<{ count: number }>('/api/notificaciones/no-leidas')
+      .then((res) => {
+        if (active) setUnreadCount(res.count);
+      })
+      .catch((err) => console.error("Error fetching initial notifications count:", err));
+
+    // 2. Suscripción Realtime sobre cambios en la tabla 'notificaciones' para este usuario
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`notificaciones-live-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notificaciones',
+          filter: `usuario_id=eq.${user.id}`
+        },
+        () => {
+          // Consultar la API para mantener el conteo sincronizado
+          apiClient.get<{ count: number }>('/api/notificaciones/no-leidas')
+            .then((res) => {
+              if (active) setUnreadCount(res.count);
+            })
+            .catch((err) => console.error("Error updating notifications count on live trigger:", err));
+        }
+      )
+      .subscribe();
+
+    // 3. Polling de respaldo cada 30 segundos (en caso de que Realtime esté deshabilitado en BD)
+    const intervalId = setInterval(() => {
+      apiClient.get<{ count: number }>('/api/notificaciones/no-leidas')
+        .then((res) => {
+          if (active) setUnreadCount(res.count);
+        })
+        .catch((err) => console.error("Error in fallback notifications polling:", err));
+    }, 30000);
+
+    return () => {
+      active = false;
+      channel.unsubscribe();
+      clearInterval(intervalId);
+    };
+  }, [user.id]);
+
+  const navItems = getNavItemsForRole(activeUser.rol);
+  const initials = (activeUser.nombre_completo || '')
     .split(' ')
     .map((n) => n[0])
     .slice(0, 2)
     .join('')
     .toUpperCase();
 
-  // Close mobile sidebar on route change
+  // Close mobile sidebar on route change only if it is open to avoid cascading renders
   useEffect(() => {
-    setSidebarOpen(false);
-  }, [pathname]);
+    if (sidebarOpen) {
+      const timer = setTimeout(() => {
+        setSidebarOpen(false);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname, sidebarOpen]);
 
   // Close mobile sidebar on Escape
   useEffect(() => {
@@ -83,7 +146,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
   };
 
   // ── Sidebar content (shared between desktop and mobile) ──
-  const SidebarContent = () => (
+  const renderSidebarContent = () => (
     <>
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border/30">
@@ -107,10 +170,10 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
           </Avatar>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-foreground truncate">
-              {user.nombre_completo}
+              {activeUser.nombre_completo}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {ROL_LABELS[user.rol] || user.rol}
+              {ROL_LABELS[activeUser.rol] || activeUser.rol}
             </p>
           </div>
         </div>
@@ -129,7 +192,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
     <div className="flex h-screen overflow-hidden bg-background">
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden lg:flex w-64 flex-col shrink-0 border-r border-border/30 bg-sidebar">
-        <SidebarContent />
+        {renderSidebarContent()}
       </aside>
 
       {/* ── Mobile Overlay ── */}
@@ -157,7 +220,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         >
           <X className="w-5 h-5" />
         </button>
-        <SidebarContent />
+        {renderSidebarContent()}
       </aside>
 
       {/* ── Main content area ── */}
@@ -177,7 +240,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             {/* Sede name */}
             <div className="hidden sm:block">
               <p className="text-sm font-semibold text-foreground leading-tight">
-                {user.sede_nombre || 'FleetIQ'}
+                {activeUser.sede_nombre || 'FleetIQ'}
               </p>
               <p className="text-xs text-muted-foreground leading-tight">
                 Panel de control
@@ -192,8 +255,10 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
               className="relative w-9 h-9 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
             >
               <Bell className="w-[18px] h-[18px]" />
-              {/* Notification badge - static placeholder */}
-              <span className="dash-notif-badge">3</span>
+              {/* Conteo de notificaciones no leídas */}
+              {unreadCount > 0 && (
+                <span className="dash-notif-badge">{unreadCount}</span>
+              )}
             </Link>
 
             <div className="w-px h-5 bg-border/50 mx-1 hidden sm:block" />
@@ -209,10 +274,10 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                   </Avatar>
                   <div className="text-left hidden md:block">
                     <p className="text-sm font-medium leading-tight">
-                      {user.nombre_completo}
+                      {activeUser.nombre_completo}
                     </p>
                     <p className="text-xs text-muted-foreground leading-tight">
-                      {ROL_LABELS[user.rol] || user.rol}
+                      {ROL_LABELS[activeUser.rol] || activeUser.rol}
                     </p>
                   </div>
                   <ChevronDown className="w-4 h-4 text-muted-foreground hidden md:block" />

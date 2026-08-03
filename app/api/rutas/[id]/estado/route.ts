@@ -135,6 +135,29 @@ export const PATCH = withRole(...ROLES_ESTADO)(async ({ request, params, user })
       }
     }
 
+    // TODO (n8n RF-13/RF-14): Cuando la integración esté activa, disparar webhook
+    // saliente al cambiar el estado de la ruta, especialmente al completarla o cancelarla.
+    // n8n puede usar esto para actualizar dashboards externos, notificar clientes, etc.
+    //
+    //   import { dispararWebhookN8n } from '@/lib/services/n8n';
+    //
+    //   if (nuevoEstado === 'completada') {
+    //     await dispararWebhookN8n('n8n_ruta_completada', {
+    //       ruta_id:     id,
+    //       camion_id:   ruta.camion_id,
+    //       sede_id:     user.sede_id,
+    //       completada_en: new Date().toISOString(),
+    //     });
+    //   }
+    //
+    //   if (nuevoEstado === 'cancelada') {
+    //     await dispararWebhookN8n('n8n_ruta_cancelada', {
+    //       ruta_id:  id,
+    //       sede_id:  user.sede_id,
+    //       cancelada_en: new Date().toISOString(),
+    //     });
+    //   }
+
     return successResponse(
       rutaActualizada,
       `Estado de ruta actualizado: "${estadoActual}" → "${nuevoEstado}"`,

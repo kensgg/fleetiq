@@ -1,6 +1,6 @@
-// pdfmake server-side Printer isn't covered by @types/pdfmake (client-only types).
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const PdfPrinter = require('pdfmake/src/Printer');
+import PdfPrinter from 'pdfmake/js/Printer';
+import virtualFs from 'pdfmake/js/virtual-fs';
+import URLResolver from 'pdfmake/js/URLResolver';
 import type { TDocumentDefinitions, Content } from 'pdfmake/interfaces';
 
 // ─────────────────────────────────────────────────────────────
@@ -19,13 +19,13 @@ export interface PdfReportData {
   fechaGeneracion: string;
 }
 
-// Fuentes estándar de pdfmake (built-in, no requieren archivos TTF)
+// Fuentes estándar de PDF (nativas en PDFKit, no requieren archivos TTF externos)
 const fonts = {
-  Roboto: {
-    normal: 'node_modules/pdfmake/build/vfs_fonts.js',
-    bold: 'node_modules/pdfmake/build/vfs_fonts.js',
-    italics: 'node_modules/pdfmake/build/vfs_fonts.js',
-    bolditalics: 'node_modules/pdfmake/build/vfs_fonts.js',
+  Helvetica: {
+    normal: 'Helvetica',
+    bold: 'Helvetica-Bold',
+    italics: 'Helvetica-Oblique',
+    bolditalics: 'Helvetica-BoldOblique',
   },
 };
 
@@ -38,7 +38,8 @@ const fonts = {
  * - Pie con filtros aplicados y fecha de generación.
  */
 export async function generarPdf(data: PdfReportData): Promise<Buffer> {
-  const printer = new PdfPrinter(fonts);
+  const urlResolver = new URLResolver(virtualFs);
+  const printer = new PdfPrinter(fonts, virtualFs, urlResolver);
 
   // Preparar encabezados de tabla
   const tableHeaders = data.columnas.map((col) => ({
@@ -208,13 +209,15 @@ export async function generarPdf(data: PdfReportData): Promise<Buffer> {
     },
 
     defaultStyle: {
+      font: 'Helvetica',
       fontSize: 10,
     },
   };
 
   // Generar PDF como buffer
+  const pdfDoc = await printer.createPdfKitDocument(docDefinition);
+
   return new Promise<Buffer>((resolve, reject) => {
-    const pdfDoc = printer.createPdfKitDocument(docDefinition);
     const chunks: Buffer[] = [];
 
     pdfDoc.on('data', (chunk: Buffer) => chunks.push(chunk));

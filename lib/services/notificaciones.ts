@@ -169,11 +169,24 @@ async function insertarNotificaciones(
         textBody: notif.mensaje,
       });
       emailsIntentados++;
+
+      // TODO (n8n RF-16/RF-17/RF-18): Cuando la integración esté activa, disparar
+      // webhook saliente por cada notificación generada para que n8n pueda
+      // ejecutar workflows adicionales (e.g., Slack, WhatsApp, crear ticket):
+      //
+      //   import { dispararWebhookN8n } from '@/lib/services/n8n';
+      //   await dispararWebhookN8n('n8n_alerta_notificacion', {
+      //     notificacion_id: notif.id,
+      //     usuario_id:      notif.usuario_id,
+      //     titulo:          notif.titulo,
+      //     mensaje:         notif.mensaje,
+      //   });
     }
   }
 
   return { insertadas: data?.length ?? 0, emailsIntentados };
 }
+
 
 // ─────────────────────────────────────────────────────────────
 // RF-16: Check de vencimiento de documentos

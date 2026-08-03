@@ -1,5 +1,4 @@
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createClient } from '@/lib/supabase/server';
 import { generarPdf, type PdfReportData } from '@/lib/services/reportes-pdf';
 import { generarXlsx, type XlsxReportData } from '@/lib/services/reportes-xlsx';
 import type { TipoReporte, FormatoReporte } from '@/lib/validations/reportes';
@@ -476,5 +475,20 @@ export async function generarReporte(
     );
   }
 
+  // TODO (n8n RF-19): Cuando la integración esté activa, disparar webhook
+  // saliente para que n8n procese el reporte generado (e.g., enviar por email,
+  // archivar en Drive, notificar en Slack):
+  //
+  //   import { dispararWebhookN8n } from '@/lib/services/n8n';
+  //   await dispararWebhookN8n('n8n_reporte_generado', {
+  //     reporte_id:  registro.id,
+  //     tipo,
+  //     formato,
+  //     archivo_url: archivoUrl,
+  //     sede_id:     sedeId,
+  //     generado_por: userId,
+  //   });
+
   return registro as ReporteGenerado;
 }
+

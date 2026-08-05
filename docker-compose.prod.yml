@@ -1,0 +1,77 @@
+# ==============================================================
+# FleetIQ — docker-compose.prod.yml (VPS / Producción)
+# Uso    : ver scripts/deploy-vps.sh
+#
+# Diferencias vs docker-compose.yml (local):
+#  - Usa .env.production en lugar de .env.local
+#  - Nginx usa nginx.prod.conf (dominio real + Let's Encrypt)
+#  - Monta volúmenes de Certbot para certificados y challenge ACME
+#  - Sin puertos de debug expuestos
+# ==============================================================
+
+services:
+
+  # ─── Next.js Application ────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL:      ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+    env_file:
+      - .env.production     # Variables server-side en el VPS
+    expose:
+      - "3000"
+    networks:
+      - fleetiq_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    # Límites de recursos (ajusta según el plan del VPS)
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # ─── Nginx Reverse Proxy (TLS / Let's Encrypt) ──────────────
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"             # HTTP — solo para ACME challenge y redirect
+      - "443:443"           # HTTPS — tráfico real
+    volumes:
+      # Configuración de producción (con dominio real)
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      # Certificados Let's Encrypt (generados por Certbot en el VPS)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Directorio webroot para los challenges de Certbot
+      - certbot_webroot:/var/www/certbot:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - fleetiq_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:80 || true"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+# ── Red interna privada ────────────────────────────────────────
+networks:
+  fleetiq_net:
+    driver: bridge
+
+# ── Volúmenes ─────────────────────────────────────────────────
+volumes:
+  # Webroot compartido entre Nginx y Certbot para desafíos ACME
+  certbot_webroot:

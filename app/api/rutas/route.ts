@@ -4,7 +4,10 @@ import { handleApiError } from '@/lib/api/errors';
 import { withRole } from '@/lib/api/middleware/authorize';
 import { createRutaSchema } from '@/lib/validations/rutas';
 import { getRouteOptimizer } from '@/lib/services/route-optimization';
+import { geocodificarDireccion, GeocodificacionError } from '@/lib/services/geocodificacion';
+import { calcularRuta } from '@/lib/services/osrm';
 import { DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@/lib/constants';
+import type { PuntoIntermedio } from '@/modules/rutas/types';
 
 // ─────────────────────────────────────────────────────────────
 // Roles de lectura y escritura para rutas
@@ -281,6 +284,112 @@ export const POST = withRole(...ROLES_ESCRITURA)(async ({ request, user }) => {
       return handleApiError(insertError);
     }
 
+    // ─── Geocodificación y cálculo de ruta (no bloqueante) ──────────────────
+    // La ruta ya está persistida. Si esta etapa falla, se loguea la advertencia
+    // y se responde igual. El endpoint GET /rutas/:id/mapa puede reintentar.
+    // ─────────────────────────────────────────────────────────────────────────
+    const geoAdvertencias: string[] = [];
+    const geoUpdate: Record<string, unknown> = {};
+
+    try {
+      // ─── Geocodificar origen si no tiene coordenadas ───
+      let origenCoords: { lat: number; lng: number } | null = null;
+      if (!ruta.origen_lat || !ruta.origen_lng) {
+        try {
+          origenCoords = await geocodificarDireccion(datos.origen);
+          geoUpdate.origen_lat = origenCoords.lat;
+          geoUpdate.origen_lng = origenCoords.lng;
+        } catch (err) {
+          const msg = err instanceof GeocodificacionError ? err.message : 'Error al geocodificar origen';
+          geoAdvertencias.push(msg);
+          console.warn(`[FleetIQ][rutas/POST] ${msg}`);
+        }
+      } else {
+        origenCoords = { lat: ruta.origen_lat as number, lng: ruta.origen_lng as number };
+      }
+
+      // ─── Geocodificar destino si no tiene coordenadas ───
+      let destinoCoords: { lat: number; lng: number } | null = null;
+      if (!ruta.destino_lat || !ruta.destino_lng) {
+        try {
+          destinoCoords = await geocodificarDireccion(datos.destino);
+          geoUpdate.destino_lat = destinoCoords.lat;
+          geoUpdate.destino_lng = destinoCoords.lng;
+        } catch (err) {
+          const msg = err instanceof GeocodificacionError ? err.message : 'Error al geocodificar destino';
+          geoAdvertencias.push(msg);
+          console.warn(`[FleetIQ][rutas/POST] ${msg}`);
+        }
+      } else {
+        destinoCoords = { lat: ruta.destino_lat as number, lng: ruta.destino_lng as number };
+      }
+
+      // ─── Geocodificar puntos intermedios sin coordenadas ───
+      const puntosGeocodificados: PuntoIntermedio[] = [];
+      let hayPuntosActualizados = false;
+
+      for (const punto of puntosFinales) {
+        if (punto.lat !== undefined && punto.lng !== undefined) {
+          puntosGeocodificados.push(punto);
+        } else {
+          try {
+            const coords = await geocodificarDireccion(punto.nombre);
+            puntosGeocodificados.push({ ...punto, lat: coords.lat, lng: coords.lng });
+            hayPuntosActualizados = true;
+          } catch (err) {
+            const msg = err instanceof GeocodificacionError
+              ? err.message
+              : `Error al geocodificar punto intermedio "${punto.nombre}"`;
+            geoAdvertencias.push(msg);
+            console.warn(`[FleetIQ][rutas/POST] ${msg}`);
+            puntosGeocodificados.push(punto); // conservar sin coords
+          }
+        }
+      }
+
+      if (hayPuntosActualizados) {
+        geoUpdate.puntos_intermedios = puntosGeocodificados;
+      }
+
+      // ─── Calcular distancia/duración con OSRM ───
+      const todosLosPuntos = [
+        ...(origenCoords ? [origenCoords] : []),
+        ...puntosGeocodificados.filter((p) => p.lat !== undefined && p.lng !== undefined)
+          .map((p) => ({ lat: p.lat!, lng: p.lng! })),
+        ...(destinoCoords ? [destinoCoords] : []),
+      ];
+
+      if (todosLosPuntos.length >= 2) {
+        const osrmResultado = await calcularRuta(todosLosPuntos);
+        if (osrmResultado) {
+          geoUpdate.distancia_km = osrmResultado.distancia_km;
+          geoUpdate.duracion_estimada_min = osrmResultado.duracion_min;
+        } else {
+          geoAdvertencias.push('No se pudo calcular la distancia y duración (OSRM no disponible). Se reintentará automáticamente.');
+        }
+      }
+
+      // ─── Persistir actualizaciones geo si las hay ───
+      if (Object.keys(geoUpdate).length > 0) {
+        const { error: geoError } = await supabase
+          .from('rutas')
+          .update({ ...geoUpdate, updated_at: new Date().toISOString() })
+          .eq('id', ruta.id);
+
+        if (geoError) {
+          console.warn(`[FleetIQ][rutas/POST] Error al persistir datos geo: ${geoError.message}`);
+          geoAdvertencias.push('Los datos de geolocalización no pudieron guardarse temporalmente.');
+        } else {
+          // Reflejar los datos geo en la respuesta sin hacer otro SELECT
+          Object.assign(ruta, geoUpdate);
+        }
+      }
+    } catch (geoErr) {
+      // Captura cualquier error inesperado en el bloque geo para no tumbar el endpoint
+      console.error('[FleetIQ][rutas/POST] Error inesperado en bloque geo:', geoErr);
+      geoAdvertencias.push('Error inesperado al procesar datos de geolocalización.');
+    }
+
     return successResponse(
       {
         ...ruta,
@@ -290,6 +399,7 @@ export const POST = withRole(...ROLES_ESCRITURA)(async ({ request, user }) => {
           distancia_estimada_km: optimizacion.distancia_estimada_km,
           duracion_estimada_min: optimizacion.duracion_estimada_min,
         },
+        ...(geoAdvertencias.length > 0 && { _geo_advertencias: geoAdvertencias }),
       },
       'Ruta creada exitosamente',
       201,

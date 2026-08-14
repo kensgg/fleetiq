@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   // See: node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/output.md
   output: "standalone",
 
+  // Exclude libraries that rely on native node modules or fs access from being bundled
+  serverExternalPackages: ["pdfkit", "pdfmake", "exceljs"],
+
   // Tell Next.js to disable buffering via Nginx's X-Accel-Buffering header.
   // Required for App Router streaming (Server Components, Suspense, Server Actions).
   // See: node_modules/next/dist/docs/01-app/02-guides/self-hosting.md#streaming-and-suspense

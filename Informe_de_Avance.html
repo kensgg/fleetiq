@@ -1,0 +1,77 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset="utf-8">
+    <title>Informe de Avance</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: #000; line-height: 1.5; margin: 40px; text-align: justify; }
+        h1 { font-size: 18pt; color: #385623; border-bottom: 2px solid #385623; padding-bottom: 5px; text-align: center; }
+        h2 { font-size: 14pt; color: #548235; margin-top: 25px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 15px; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+        th { background-color: #E2EFDA; font-weight: bold; text-align: center; }
+        .chart-container { text-align: center; margin: 20px 0; }
+        .chart-container img { max-width: 500px; height: auto; border: 1px solid #ccc; padding: 10px; }
+        p { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>Informe de Avance del Proyecto (Progress Report)</h1>
+    
+    <h2>1. Resumen Ejecutivo del Periodo</h2>
+    <p>Este documento consolida el registro auditable de los incrementos de producto generados para la plataforma <strong>FleetIQ</strong>, cubriendo el ciclo de desarrollo formalizado entre el <strong>22 de mayo de 2026</strong> y el <strong>05 de agosto de 2026</strong>. El propósito de este informe es proveer transparencia a las partes interesadas (stakeholders) respecto al progreso de los paquetes de trabajo estipulados y la medición del desempeño del equipo en base al esfuerzo realizado.</p>
+
+    <h2>2. Registro Detallado de Avances (Git Commit Log)</h2>
+    <p>A continuación se detallan las aportaciones técnicas registradas directamente en el sistema de control de versiones, fungiendo como evidencia empírica de las iteraciones de desarrollo y la entrega continua de valor:</p>
+    <table>
+        <tr>
+            <th>Fecha de Integración</th>
+            <th>Responsable</th>
+            <th>Componente / Archivo Afectado</th>
+            <th>Descripción Técnica del Incremento</th>
+        </tr>
+        <tr><td>22 May 2026</td><td>Gerardo</td><td><code>package.json</code>, Config general</td><td>Despliegue del esqueleto de la aplicación (Initial commit & architecture base).</td></tr>
+        <tr><td>10 Jul 2026</td><td>Abigailhdz04</td><td><code>modules/</code> (Legal y Privacidad)</td><td>Generación de políticas de resguardo de datos (aviso de privacidad en registro).</td></tr>
+        <tr><td>10 Jul 2026</td><td>Gerardo</td><td><code>lib/supabase</code>, <code>auth/</code></td><td>Construcción de módulos de control de accesos (Auth) e interfaces de usuario asociadas.</td></tr>
+        <tr><td>03 Ago 2026</td><td>Abigailhdz04</td><td><code>modules/*</code></td><td>Estructuración y codificación de los dominios Core: Conductores, Vehículos, Rutas y Reportes.</td></tr>
+        <tr><td>03 Ago 2026</td><td>Gerardo</td><td><code>Dockerfile</code>, <code>railway.json</code></td><td>Implementación de tareas DevOps (preparación del contenedor para Railway).</td></tr>
+    </table>
+
+    <h2>3. Resumen de Desempeño y Asignación de Recursos</h2>
+    <p>La distribución del esfuerzo técnico y analítico del equipo multidisciplinario durante este periodo de reporte se consolida de la siguiente forma. Este análisis permite la correcta distribución de responsabilidades y el monitoreo de la eficiencia de los recursos (según métricas de aportaciones en repositorio):</p>
+    
+    <ul>
+        <li><strong>Oscar Rivera Gonzalez:</strong> 9 commits consolidados.</li>
+        <li><strong>Gerardo:</strong> 7 commits consolidados.</li>
+        <li><strong>Abigailhdz04:</strong> 2 commits consolidados.</li>
+        <li><strong>Evelyn Elena:</strong> Participación como Colaboradora de Proyecto (Enfoque en fase de análisis, gestión de requerimientos y documentación sin commits directos a la base de código).</li>
+    </ul>
+
+    <div class="chart-container">
+        <!-- Gráfica de pastel generada con QuickChart -->
+        <img src="https://quickchart.io/chart?c={type:'pie',data:{labels:['Oscar Rivera (50%25)','Gerardo (39%25)','Abigail (11%25)'],datasets:[{data:[9,7,2],backgroundColor:['%23548235','%23A9D18E','%23E2EFDA']}]},options:{title:{display:true,text:'Distribucion del Esfuerzo de Codificacion (Commits)'}}}" alt="Gráfica de Commits por Integrante">
+    </div>
+
+    <h2>4. Entregables Técnicos Generados (Deliverables)</h2>
+    <p>Durante la ventana de tiempo auditada, el equipo logró materializar de forma tangible los siguientes elementos que agregan valor al ciclo de vida del producto:</p>
+    <ul>
+        <li><strong>Artefactos de Documentación:</strong> Consolidación del manual de operaciones (<code>README.md</code>), lineamientos gráficos y de interfaz de usuario (<code>DESIGN_SYSTEM.md</code>), y la especificación del esquema de base de datos relacional (<code>database_context.txt</code>).</li>
+        <li><strong>Configuración Base y UI:</strong> Adopción del marco de trabajo Next.js acoplado con motores de estilización mediante Tailwind CSS.</li>
+        <li><strong>Artefactos DevOps y Despliegue:</strong> Generación de un <code>Dockerfile</code> optimizado (multi-stage) y perfiles de automatización para CI/CD (<code>railway.json</code>, <code>docker-compose.yml</code>).</li>
+        <li><strong>Cascarón de Negocio:</strong> Creación física de la estructura de subdirectorios para las entidades clave (Vehículos, Conductores, Empresas, Incidentes, Rutas y Reportes).</li>
+    </ul>
+
+    <h2>5. Siguientes Pasos y Plan de Acción Futuro</h2>
+    <p>Con base en la evaluación de los entregables y el cronograma vigente, la ruta crítica de trabajo para la siguiente iteración deberá concentrarse en los siguientes puntos clave:</p>
+    <ul>
+        <li><strong>Resolución de Deuda Técnica (ORM):</strong> Validar y justifycar la ausencia de Prisma; en caso de que se determine como imperativo, ejecutar su inmediata integración técnica e hibridación con el esquema Supabase existente.</li>
+        <li><strong>Codificación de Lógica Profunda:</strong> Trasladar la estructura vacía actual de la carpeta <code>modules/</code> hacia vistas funcionales, interconectándolas mediante el App Router de Next.js (<code>app/</code>).</li>
+        <li><strong>Aseguramiento de Calidad (QA):</strong> Implementar una auditoría de rendimiento sobre la versión elegida del Framework frontend (16.2.6 vs 14) para certificar su estabilidad ante el cliente final.</li>
+    </ul>
+
+    <h2>6. Medición de Avance Estimado</h2>
+    <p>En función de la comparativa entre la estructura del repositorio y el plan maestro del proyecto (Work Breakdown Structure de 68 paquetes de trabajo), se concluye lo siguiente:</p>
+    <p><strong>Estimación Cuantitativa: ~20% de Avance General.</strong> Esta cifra refleja la superación exitosa de las fases de planificación arquitectónica y configuración de infraestructura (DevOps/CI/CD). La mayor porción restante recae sobre el desarrollo intrínseco de las funciones de negocio y pruebas de validación final.</p>
+
+</body>
+</html>

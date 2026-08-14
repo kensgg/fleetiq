@@ -66,5 +66,9 @@ ENV PORT=3000
 
 EXPOSE 3000
 
+# Healthcheck para verificar que Next.js está respondiendo
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+
 # next.config.ts sets output:"standalone" → entry point is server.js
 CMD ["node", "server.js"]

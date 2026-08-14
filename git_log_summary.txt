@@ -1,0 +1,18 @@
+﻿07f601d | 2026-08-05 | Oscar Rivera Gonzalez | empaquetar
+b877a77 | 2026-08-05 | Oscar Rivera Gonzalez | oski
+83db857 | 2026-08-03 | Abigailhdz04 | Implementa m├│dulos de conductores, veh├¡culos, rutas, reportes y mejoras del dashboard
+b2bb1b8 | 2026-07-10 | Abigailhdz04 | Implementa aviso y pol├¡tica de privacidad en el registro
+d33d01e | 2026-08-03 | Gerardo | fix: cambiar healthcheck a /api/health para Railway
+3ae870c | 2026-08-03 | Gerardo | chore: preparar proyecto para despliegue en Railway con Docker
+79570d8 | 2026-08-03 | Oscar Rivera Gonzalez | promt: 6, 7, 8. Fin del backend
+eb84623 | 2026-07-20 | Oscar Rivera Gonzalez | prompt 4, 5 y 6(terminar)
+8dbe63a | 2026-07-20 | Oscar Rivera Gonzalez | prompt 03 backend
+5f88fcb | 2026-07-17 | Gerardo | Correccion de problemas con la conexion a base de datos, mejora de interfaces y creacion de muck up dashboard
+c4e8fff | 2026-07-17 | Oscar Rivera Gonzalez | prompt 00 interfaz
+fd3196f | 2026-07-17 | Oscar Rivera Gonzalez | prompt 02
+8d12560 | 2026-07-10 | Oscar Rivera Gonzalez | Mejora de dise├▒os
+9e32949 | 2026-07-10 | Gerardo | design: full UI redesign ÔÇö dark navy theme, Inter font, glassmorphism auth, colored role badges
+067f939 | 2026-07-10 | Gerardo | feat(auth): implement auth and users module with UI
+8ebeee9 | 2026-07-10 | Oscar Rivera Gonzalez | oscar gonzalez, prompt 0.
+5a306c7 | 2026-05-22 | Gerardo | project architecture base
+5324ebd | 2026-05-22 | Gerardo | Initial commit from Create Next App

@@ -1,0 +1,73 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset="utf-8">
+    <title>Reporte de Estado de Proyecto</title>
+    <style>
+        body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; color: #000; line-height: 1.5; margin: 40px; text-align: justify; }
+        h1 { font-size: 18pt; color: #1F3864; border-bottom: 2px solid #1F3864; padding-bottom: 5px; text-align: center; }
+        h2 { font-size: 14pt; color: #2F5496; margin-top: 25px; }
+        h3 { font-size: 12pt; color: #2E74B5; margin-top: 15px; font-style: italic; }
+        table { border-collapse: collapse; width: 100%; margin-top: 15px; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+        th { background-color: #D9E1F2; font-weight: bold; text-align: center; }
+        .chart-container { text-align: center; margin: 20px 0; }
+        .chart-container img { max-width: 600px; height: auto; border: 1px solid #ccc; padding: 10px; }
+        p { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <h1>Reporte de Estado del Proyecto: FleetIQ</h1>
+    
+    <h2>1. Contexto y Datos Generales del Proyecto</h2>
+    <p>En el marco de la asignatura de <strong>Administración de Proyectos de TI</strong>, el presente documento expone el estado actual, alcance y análisis estructural del proyecto denominado <em>FleetIQ</em>. Este sistema se concibe como una plataforma SaaS (Software as a Service) orientada a la gestión y administración integral de flotillas para el cliente corporativo <strong>3 Guerras</strong>. Desde la perspectiva de la gestión de integración del proyecto (alineado a estándares del PMBOK), el propósito de este esfuerzo es unificar la logística operativa mediante un ecosistema digital escalable.</p>
+    
+    <ul>
+        <li><strong>Nombre del Proyecto:</strong> FleetIQ - Plataforma SaaS de Gestión de Flotillas</li>
+        <li><strong>Cliente / Stakeholder Principal:</strong> 3 Guerras</li>
+        <li><strong>Stack Tecnológico Definido (Baseline):</strong> Next.js 14, TypeScript, Prisma, Supabase</li>
+        <li><strong>Stack Tecnológico Actual (Ejecución):</strong> Next.js 16.2.6, TypeScript, Supabase nativo</li>
+    </ul>
+
+    <h2>2. Gestión del Alcance y Objetivos</h2>
+    <p>El objetivo principal del proyecto radica en sistematizar y optimizar el control de vehículos, conductores, rutas e incidentes mediante un panel centralizado. Basado en la recopilación de requerimientos iniciales, el alcance delimita la construcción de módulos interconectados utilizando una arquitectura moderna orientada a componentes. La correcta definición del alcance (Scope Statement) nos permite asegurar que los entregables satisfagan los criterios de aceptación de calidad impuestos por el entorno productivo contenerizado (Railway/Docker).</p>
+
+    <h2>3. Enfoque Metodológico y Arquitectura Organizacional</h2>
+    <p>Para la ejecución de FleetIQ, el equipo de desarrollo ha adoptado un enfoque ágil-híbrido. La gestión de la configuración y control de versiones se sustenta en un flujo colaborativo inspirado en <strong>GitLab Flow</strong>, garantizando integración continua y despliegues seguros. En términos de arquitectura de software, se evidencia una fuerte adherencia al <strong>Feature-Sliced Design</strong> (patrón por dominios de negocio), lo cual favorece la mantenibilidad a largo plazo y reduce la deuda técnica estructural. Esto es observable en la estructuración de la carpeta <code>modules/</code>, segregando responsabilidades claramente.</p>
+
+    <h2>4. Análisis del Estado Actual y Paquetes de Trabajo (WBS)</h2>
+    <p>De acuerdo a la Estructura de Desglose de Trabajo (WBS) teórica planificada, el proyecto se encuentra en una etapa de madurez técnica inicial-media. Se han completado los cimientos de la infraestructura, pero la implementación profunda de la lógica de negocio se mantiene en fase de codificación.</p>
+    
+    <div class="chart-container">
+        <!-- Gráfica de Avance de Fases generada con QuickChart -->
+        <img src="https://quickchart.io/chart?c={type:'horizontalBar',data:{labels:['Infraestructura y DevOps','Diseño (UI/UX)','Estructura Modular','Lógica de Negocio (Backend)'],datasets:[{label:'Nivel de Avance',data:[100,100,80,15],backgroundColor:['%232F5496','%234472C4','%238FAADC','%23B4C6E7']}]},options:{title:{display:true,text:'Grado de Avance por Fase del Proyecto'},scales:{xAxes:[{ticks:{min:0,max:100}}]}}}" alt="Gráfica de Avance de Fases">
+    </div>
+
+    <h2>5. Hitos Alcanzados (Milestones) y Evidencia Técnica</h2>
+    <p>La siguiente matriz relaciona los compromisos de las fases de ejecución con su respectiva evidencia en el repositorio, demostrando la trazabilidad del trabajo del equipo:</p>
+    <table>
+        <tr>
+            <th>Fecha de Hito</th>
+            <th>Fase / Módulo</th>
+            <th>Hash de Integración</th>
+            <th>Evidencia de Entrega (Descripción)</th>
+        </tr>
+        <tr><td>22 May 2026</td><td>Inicialización e Infraestructura</td><td><code>5324ebd</code></td><td>Establecimiento de la arquitectura base y dependencias iniciales del ecosistema Next.js.</td></tr>
+        <tr><td>10 Jul 2026</td><td>Seguridad y Autenticación</td><td><code>067f939</code></td><td>Implementación completa del módulo de usuarios y barreras de autenticación UI.</td></tr>
+        <tr><td>17 Jul 2026</td><td>Conectividad a Base de Datos</td><td><code>5f88fcb</code></td><td>Resolución de incidencias de conectividad con Supabase y estandarización del Dashboard.</td></tr>
+        <tr><td>03 Ago 2026</td><td>Estructura de Negocio Core</td><td><code>83db857</code></td><td>Despliegue de los módulos base requeridos por el cliente: conductores, vehículos, rutas y reportes.</td></tr>
+        <tr><td>03 Ago 2026</td><td>CI/CD y Contenerización</td><td><code>3ae870c</code></td><td>Orquestación final mediante Docker y configuración estricta para despliegues en Railway.</td></tr>
+    </table>
+
+    <h2>6. Gestión de Riesgos (Risk Management)</h2>
+    <p>En apego a las mejores prácticas de administración de proyectos, se ha realizado un levantamiento y auditoría temprana del repositorio para la identificación de riesgos técnicos que pudiesen impactar el costo o el cronograma (Triple Restricción):</p>
+    <ul>
+        <li><strong>Riesgo Arquitectónico (Stack Mismatch):</strong> El documento de requerimientos establece el uso de <em>Next.js 14</em>; no obstante, el entorno operativo ha sido escalado a la versión <em>16.2.6</em>. Esto representa un cambio de alcance técnico que requiere formalizarse a través de una solicitud de cambio (Change Request) para evitar incompatibilidades futuras en el App Router.</li>
+        <li><strong>Riesgo de Integración de Datos (ORM):</strong> El plan contemplaba <em>Prisma</em> como capa de mapeo de base de datos. Actualmente, la dependencia se encuentra ausente y los esfuerzos apuntan al uso directo de la SDK de Supabase. Es mandatorio clarificar si esto obedece a una estrategia de optimización o una desviación del plan original.</li>
+    </ul>
+
+    <h2>7. Conclusiones Directivas</h2>
+    <p>El esfuerzo invertido hasta la fecha demuestra un sólido manejo de los principios de ingeniería de software. La cimentación de la plataforma FleetIQ está formalmente establecida. Para asegurar el éxito del proyecto y la alineación con las expectativas del stakeholder, el equipo directivo debe enfocarse en regularizar la documentación del stack tecnológico y proceder con la interconexión de la interfaz de usuario con los esquemas de bases de datos aprovisionados.</p>
+
+</body>
+</html>

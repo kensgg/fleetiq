@@ -7,8 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import {
   Truck, AlertTriangle, AlertCircle, Info, BarChart3, TrendingUp, ShieldAlert,
-  ArrowRight, Users, Plus, ShieldCheck, Wrench, Ban, Activity, Loader2
+  ArrowRight, Users, Plus, ShieldCheck, Wrench, Ban, Activity, Loader2, MapPin, Maximize2
 } from 'lucide-react';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
+import dynamic from 'next/dynamic';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { RoleGate } from '@/components/dashboard/RoleGate';
 import { apiClient } from '@/lib/api/client';
@@ -24,6 +26,11 @@ interface FlotaData {
   fuera_servicio: number;
   conductores_activos: number;
 }
+
+const LiveMap = dynamic(() => import('@/components/dashboard/LiveMap'), {
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full bg-muted/20 animate-pulse rounded-xl flex items-center justify-center text-muted-foreground flex-col gap-2"><MapPin className="w-8 h-8 opacity-50" /><span>Cargando mapa en vivo...</span></div>
+});
 
 interface AlertaReciente {
   id: string;
@@ -201,25 +208,37 @@ export default function DashboardPage() {
 
   // ─────────────── DASHBOARD OPERATIVO COMPLETO ───────────────
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard Operativo</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Vista general y control logístico de la sede: KPIs, camiones, alertas y rendimientos.
-        </p>
-      </div>
-
-      {errorMsg && (
-        <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-sm text-destructive font-medium">
-          {errorMsg}
+    <div className="w-full flex flex-col min-h-screen">
+      {/* MAPA HERO: Ocupa 80% del alto de la pantalla (un poco más de 3/4) */}
+      <div className="relative w-full h-[80vh] bg-slate-900 border-b border-border/50 shadow-2xl z-0">
+        <LiveMap />
+        
+        {/* Capa de gradiente oscuro encima del mapa para que destaque el texto/header */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-background/90 to-transparent pointer-events-none z-10" />
+        
+        {/* Header flotante encima del mapa */}
+        <div className="absolute top-6 left-6 right-6 z-20 pointer-events-none">
+          <div className="max-w-7xl mx-auto flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-foreground drop-shadow-md">Centro de Comando</h1>
+              <p className="text-sm font-medium text-muted-foreground mt-1 drop-shadow-md bg-background/50 backdrop-blur-md px-3 py-1 rounded-full inline-block border border-border/50">
+                Monitoreo logístico y métricas en tiempo real
+              </p>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Row 1: KPI de Flota (Resumen por Estado) */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        {errorMsg && (
+          <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20 p-4 rounded-xl bg-destructive/90 border border-destructive/20 text-sm text-destructive-foreground font-medium shadow-xl backdrop-blur-md">
+            {errorMsg}
+          </div>
+        )}
+
+        {/* KPIs Flotantes (Row 1) superpuestos en la parte inferior del mapa */}
+        <div className="absolute bottom-6 left-0 right-0 z-20 px-6">
+          <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-6 gap-4">
         {/* Camiones totales */}
-        <Card className="border border-border/40 bg-card hover:shadow-md transition-shadow">
+        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Total Flota</span>
@@ -233,21 +252,21 @@ export default function DashboardPage() {
         </Card>
 
         {/* Disponibles */}
-        <Card className="border border-border/40 bg-card hover:shadow-md transition-shadow">
+        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Disponibles</span>
-              <ShieldCheck className="w-4 h-4 text-teal-400" />
+              <ShieldCheck className="w-4 h-4 text-teal-500" />
             </div>
             <div className="mt-2.5">
-              <div className="text-2xl font-extrabold text-teal-400">{flota.disponibles}</div>
+              <div className="text-2xl font-extrabold text-teal-500">{flota.disponibles}</div>
               <p className="text-[10px] text-muted-foreground mt-0.5">Listos para ruta</p>
             </div>
           </CardContent>
         </Card>
 
         {/* En ruta */}
-        <Card className="border border-border/40 bg-card hover:shadow-md transition-shadow">
+        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">En ruta</span>
@@ -261,7 +280,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Mantenimiento */}
-        <Card className="border border-border/40 bg-card hover:shadow-md transition-shadow">
+        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Taller</span>
@@ -275,7 +294,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Fuera de servicio */}
-        <Card className="border border-border/40 bg-card hover:shadow-md transition-shadow">
+        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Fuera servicio</span>
@@ -289,7 +308,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Conductores */}
-        <Card className="border border-border/40 bg-card hover:shadow-md transition-shadow">
+        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Conductores</span>
@@ -301,10 +320,14 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
+
+
+          </div>
+        </div>
       </div>
 
-      {/* Row 2: Gráficas y Alertas */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Row 2: Gráficas y Alertas (Debajo del mapa) */}
+      <div className="max-w-7xl mx-auto px-6 w-full mt-10 grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         {/* Lado izquierdo: KPIs de Rendimiento (Eficiencia y Kilómetros) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Gráfica 1: Eficiencia de Rutas Semanal */}

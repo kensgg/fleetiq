@@ -67,7 +67,11 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       .then((res) => {
         if (active) setUnreadCount(res.count);
       })
-      .catch((err) => console.error("Error fetching initial notifications count:", err));
+      .catch((err: any) => {
+        if (err?.status !== 401) {
+          console.error("Error fetching initial notifications count:", err);
+        }
+      });
 
     // 2. Suscripción Realtime sobre cambios en la tabla 'notificaciones' para este usuario
     const supabase = createClient();
@@ -87,7 +91,11 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             .then((res) => {
               if (active) setUnreadCount(res.count);
             })
-            .catch((err) => console.error("Error updating notifications count on live trigger:", err));
+            .catch((err: any) => {
+              if (err?.status !== 401) {
+                console.error("Error updating notifications count on live trigger:", err);
+              }
+            });
         }
       )
       .subscribe();
@@ -98,7 +106,11 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         .then((res) => {
           if (active) setUnreadCount(res.count);
         })
-        .catch((err) => console.error("Error in fallback notifications polling:", err));
+        .catch((err: any) => {
+          if (err?.status !== 401) {
+            console.error("Error in fallback notifications polling:", err);
+          }
+        });
     }, 30000);
 
     return () => {

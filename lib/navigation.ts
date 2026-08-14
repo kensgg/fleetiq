@@ -5,9 +5,7 @@ import {
   Map,
   Bell,
   BarChart3,
-  Bot,
   UserCog,
-  Settings,
   type LucideIcon,
 } from 'lucide-react';
 import type { RolUsuario } from '@/lib/types';
@@ -81,21 +79,9 @@ export const NAV_ITEMS: NavItem[] = [
     allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor'],
   },
   {
-    label: 'Chatbot IA',
-    href: '/dashboard/asistente',
-    icon: Bot,
-    allowedRoles: ['administrador', 'gerente_operaciones', 'supervisor', 'conductor'],
-  },
-  {
     label: 'Usuarios',
     href: '/dashboard/usuarios',
     icon: UserCog,
-    allowedRoles: ['administrador'],
-  },
-  {
-    label: 'Integraciones',
-    href: '/dashboard/configuracion',
-    icon: Settings,
     allowedRoles: ['administrador'],
   },
 ];

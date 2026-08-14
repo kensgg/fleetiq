@@ -70,9 +70,9 @@ export default function NuevaRutaPage() {
     mensaje: string;
   } | null>(null);
 
-  // 1. Proteger ruta: SOLO gerente_operaciones y supervisor pueden crear rutas
+  // 1. Proteger ruta: Administradores, gerente_operaciones y supervisor pueden crear rutas
   useEffect(() => {
-    if (!userLoading && (!user || !['gerente_operaciones', 'supervisor'].includes(user.rol))) {
+    if (!userLoading && (!user || !['administrador', 'gerente_operaciones', 'supervisor'].includes(user.rol))) {
       router.push('/dashboard/rutas');
     }
   }, [user, userLoading, router]);
@@ -80,7 +80,7 @@ export default function NuevaRutaPage() {
   // 2. Cargar camiones disponibles y conductores libres en la sede
   useEffect(() => {
     let active = true;
-    if (user && ['gerente_operaciones', 'supervisor'].includes(user.rol)) {
+    if (user && ['administrador', 'gerente_operaciones', 'supervisor'].includes(user.rol)) {
       Promise.resolve().then(() => {
         if (active) {
           setLoadingOptions(true);
@@ -121,7 +121,7 @@ export default function NuevaRutaPage() {
     };
   }, [user]);
 
-  if (userLoading || !user || !['gerente_operaciones', 'supervisor'].includes(user.rol)) {
+  if (userLoading || !user || !['administrador', 'gerente_operaciones', 'supervisor'].includes(user.rol)) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />

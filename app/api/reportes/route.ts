@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { successResponse, errorResponse } from '@/lib/api/responses';
 import { handleApiError } from '@/lib/api/errors';
 import { withRole } from '@/lib/api/middleware/authorize';
@@ -31,7 +32,7 @@ const ROLES_GENERACION = [
  */
 export const GET = withRole(...ROLES_LECTURA)(async ({ request, user }) => {
   try {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { searchParams } = new URL(request.url);
 
     // Paginación

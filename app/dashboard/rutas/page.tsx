@@ -365,8 +365,8 @@ export default function RutasPage() {
             <RefreshCw className={`w-4 h-4 ${adminRutasLoading ? 'animate-spin' : ''}`} />
           </Button>
 
-          {/* Solo supervisor y gerente_operaciones pueden crear rutas */}
-          <RoleGate roles={['gerente_operaciones', 'supervisor']}>
+          {/* Solo administradores, supervisor y gerente_operaciones pueden crear rutas */}
+          <RoleGate roles={['administrador', 'gerente_operaciones', 'supervisor']}>
             <Button asChild className="h-9 rounded-xl shadow-lg shadow-primary/20 font-medium">
               <Link href="/dashboard/rutas/nuevo">
                 <Plus className="w-4 h-4 mr-1.5" />

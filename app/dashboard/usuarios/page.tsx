@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import {
-  Users, UserCheck, UserX, MoreVertical, Plus, Edit, Trash, Shield,
+  Users, UserCheck, UserX, MoreVertical, Edit, Trash, Shield,
   Activity, RefreshCw, UserCog,
 } from 'lucide-react';
+import { NuevoUsuarioModal } from '@/components/dashboard/NuevoUsuarioModal';
 
 type RolUsuario = 'administrador' | 'gerente_operaciones' | 'supervisor' | 'conductor' | 'capturista';
 
@@ -144,10 +145,7 @@ export default function UsuariosPage() {
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           </Button>
-          <Button className="h-9 rounded-xl shadow-lg shadow-primary/20 font-medium">
-            <Plus className="w-4 h-4 mr-1.5" />
-            Nuevo usuario
-          </Button>
+          <NuevoUsuarioModal onUserCreated={() => fetchUsers(true)} />
         </div>
       </div>
 

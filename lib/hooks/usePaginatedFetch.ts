@@ -93,6 +93,8 @@ export function usePaginatedFetch<T>(
           queryParams.set(key, String(val));
         }
       });
+      
+      queryParams.set('_t', String(Date.now())); // Cache buster
 
       const endpoint = `${url}?${queryParams.toString()}`;
       const res = await apiClient.get<PaginatedData<T>>(endpoint);

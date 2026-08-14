@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, DM_Serif_Display } from "next/font/google";
 import "./globals.css";
-
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -30,7 +29,9 @@ export default function RootLayout({
       className={`${geistMono.variable} ${dmSerifDisplay.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>{children}</body>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

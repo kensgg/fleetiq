@@ -27,6 +27,7 @@ interface RutasResponse {
   items: Array<{
     id: string;
     conductor_id: string;
+    camion_id: string;
     estado: string;
   }>;
 }

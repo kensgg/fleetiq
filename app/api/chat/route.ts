@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     // Ignoramos el primer mensaje del cliente si es el mensaje de bienvenida de Gemini 
     // porque Gemini no permite un primer mensaje con rol 'model' en el historial si es strict, 
     // pero para mantener coherencia lo mapeamos.
-    let contents = messages.map((msg: any) => ({
+    let contents: any[] = messages.map((msg: any) => ({
       role: msg.role === "gemini" ? "model" : "user",
       parts: [{ text: msg.text }],
     }));

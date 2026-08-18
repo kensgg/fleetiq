@@ -238,7 +238,7 @@ export default function DashboardPage() {
         <div className="absolute bottom-6 left-0 right-0 z-20 px-6">
           <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-6 gap-4">
         {/* Camiones totales */}
-        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
+        <Card className="!bg-black/80 !backdrop-blur-2xl !border-white/10 hover:!bg-black transition-colors shadow-2xl">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Total Flota</span>
@@ -252,7 +252,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Disponibles */}
-        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
+        <Card className="!bg-black/80 !backdrop-blur-2xl !border-white/10 hover:!bg-black transition-colors shadow-2xl">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Disponibles</span>
@@ -266,7 +266,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* En ruta */}
-        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
+        <Card className="!bg-black/80 !backdrop-blur-2xl !border-white/10 hover:!bg-black transition-colors shadow-2xl">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">En ruta</span>
@@ -280,7 +280,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Mantenimiento */}
-        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
+        <Card className="!bg-black/80 !backdrop-blur-2xl !border-white/10 hover:!bg-black transition-colors shadow-2xl">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Taller</span>
@@ -294,7 +294,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Fuera de servicio */}
-        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
+        <Card className="!bg-black/80 !backdrop-blur-2xl !border-white/10 hover:!bg-black transition-colors shadow-2xl">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Fuera servicio</span>
@@ -308,7 +308,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Conductores */}
-        <Card className="border border-border/40 bg-card/90 backdrop-blur hover:shadow-md transition-shadow">
+        <Card className="!bg-black/80 !backdrop-blur-2xl !border-white/10 hover:!bg-black transition-colors shadow-2xl">
           <CardContent className="p-4 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between">
               <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Conductores</span>

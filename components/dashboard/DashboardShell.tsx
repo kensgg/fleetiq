@@ -201,11 +201,13 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      {/* ── Desktop Sidebar ── */}
-      <aside className="hidden lg:flex w-64 flex-col shrink-0 border-r border-border/30 bg-sidebar">
-        {renderSidebarContent()}
-      </aside>
+    <div className="flex h-screen w-screen bg-transparent overflow-hidden">
+      {/* ── Desktop Sidebar (Floating) ── */}
+      <div className="hidden lg:flex flex-col shrink-0 p-6 pr-0">
+        <aside className="w-64 h-full flex flex-col shrink-0 glass-panel rounded-[2rem] overflow-hidden">
+          {renderSidebarContent()}
+        </aside>
+      </div>
 
       {/* ── Mobile Overlay ── */}
       {sidebarOpen && (
@@ -219,7 +221,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       {/* ── Mobile Sidebar Drawer ── */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-sidebar border-r border-border/30
+          fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-sidebar/80 backdrop-blur-2xl border-r border-white/5
           transform transition-transform duration-300 ease-in-out lg:hidden
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
@@ -235,10 +237,10 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
         {renderSidebarContent()}
       </aside>
 
-      {/* ── Main content area ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* ── Main content area (No flotante) ── */}
+      <div className="flex-1 h-full flex flex-col overflow-hidden relative">
         {/* Topbar */}
-        <header className="h-16 flex items-center justify-between px-4 md:px-6 border-b border-border/30 bg-card/50 backdrop-blur-sm shrink-0">
+        <header className="h-20 flex items-center justify-between px-6 md:px-8 shrink-0 bg-transparent border-b border-white/5">
           <div className="flex items-center gap-3">
             {/* Hamburger (mobile only) */}
             <button

@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Geist_Mono, DM_Serif_Display } from "next/font/google";
+import { Lato } from "next/font/google";
+import Chatbot from "@/components/chatbot/Chatbot";
 import "./globals.css";
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
-const dmSerifDisplay = DM_Serif_Display({
-  weight: "400",
-  variable: "--font-dm-serif",
+const lato = Lato({
+  weight: ["300", "400", "700", "900"],
+  variable: "--font-lato",
   subsets: ["latin"],
   display: "swap",
 });
@@ -26,12 +23,18 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${geistMono.variable} ${dmSerifDisplay.variable} h-full antialiased`}
+      className={`${lato.variable} font-sans h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
+        <div className="ambient-bg" aria-hidden="true" />
+        
         {children}
+        
+        {/* Widget del Chatbot global */}
+        <Chatbot />
       </body>
     </html>
   );
 }
+

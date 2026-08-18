@@ -60,7 +60,7 @@ export default function ChatWindow({
         )}
 
         {messages.map((msg) => (
-          <ChatMessage key={msg.id} role={msg.role} text={msg.text} />
+          <ChatMessage key={msg.id} id={msg.id} role={msg.role} text={msg.text} />
         ))}
 
         {isLoading && (

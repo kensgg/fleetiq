@@ -20,6 +20,7 @@ const ROLES_LECTURA = [
 ] as const;
 
 const ROLES_ESCRITURA = [
+  'administrador',
   'gerente_operaciones',
   'supervisor',
 ] as const;
@@ -396,8 +397,8 @@ export const POST = withRole(...ROLES_ESCRITURA)(async ({ request, user }) => {
         _optimizacion: {
           optimizado: optimizacion.optimizado,
           mensaje: optimizacion.mensaje,
-          distancia_estimada_km: optimizacion.distancia_estimada_km,
-          duracion_estimada_min: optimizacion.duracion_estimada_min,
+          distancia_estimada_km: optimizacion.distancia_estimada_km ?? geoUpdate.distancia_km ?? null,
+          duracion_estimada_min: optimizacion.duracion_estimada_min ?? geoUpdate.duracion_estimada_min ?? null,
         },
         ...(geoAdvertencias.length > 0 && { _geo_advertencias: geoAdvertencias }),
       },

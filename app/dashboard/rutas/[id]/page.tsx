@@ -14,6 +14,9 @@ import { apiClient, ApiClientError } from '@/lib/api/client';
 import { createClient } from '@/lib/supabase/client';
 import type { Ruta, PuntoIntermedio } from '@/modules/rutas/types';
 import type { EstadoRuta, TipoIncidencia } from '@/lib/types';
+import dynamic from 'next/dynamic';
+
+const RouteMap = dynamic(() => import('@/components/map/RouteMap'), { ssr: false });
 
 interface Incidencia {
   id: string;
@@ -68,6 +71,10 @@ export default function DetalleRutaPage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [accessDenied, setAccessDenied] = useState(false);
 
+  // Estado del mapa
+  const [mapData, setMapData] = useState<any>(null);
+  const [mapLoading, setMapLoading] = useState(true);
+
   // Estados para actualizar estado de la ruta
   const [statusLoading, setStatusLoading] = useState(false);
   const [statusError, setStatusError] = useState('');
@@ -91,21 +98,28 @@ export default function DetalleRutaPage() {
             apiClient.get<RutaConDetalle>(`/api/rutas/${rutaId}`),
             user.rol === 'conductor'
               ? supabase.from('conductores').select('id').eq('profile_id', authUser.id).single()
-              : Promise.resolve(null)
+              : Promise.resolve(null),
+            apiClient.get<any>(`/api/rutas/${rutaId}/mapa`).catch(err => {
+              console.warn("Error loading map data:", err);
+              return null;
+            })
           ]);
         })
-        .then(([rutaRes, conductorRes]) => {
+        .then(([rutaRes, conductorRes, mapRes]) => {
           if (active) {
             if (user.rol === 'conductor' && conductorRes) {
               const condData = conductorRes.data as { id: string } | null;
               if (!condData || rutaRes.conductor_id !== condData.id) {
                 setAccessDenied(true);
                 setLoading(false);
+                setMapLoading(false);
                 return;
               }
             }
             setRuta(rutaRes);
+            setMapData(mapRes);
             setLoading(false);
+            setMapLoading(false);
           }
         })
         .catch((err) => {
@@ -137,6 +151,13 @@ export default function DetalleRutaPage() {
       }
 
       const data = await apiClient.get<RutaConDetalle>(`/api/rutas/${rutaId}`);
+      
+      let mapDataRes = null;
+      try {
+        mapDataRes = await apiClient.get<any>(`/api/rutas/${rutaId}/mapa`);
+      } catch (err) {
+        console.warn("Error loading map data on refresh:", err);
+      }
 
       if (user?.rol === 'conductor') {
         const { data: conductor } = await supabase
@@ -152,6 +173,7 @@ export default function DetalleRutaPage() {
       }
 
       setRuta(data);
+      setMapData(mapDataRes);
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Error al recargar los datos del viaje');
     } finally {
@@ -170,7 +192,7 @@ export default function DetalleRutaPage() {
 
     try {
       const updated = await apiClient.patch<RutaConDetalle>(`/api/rutas/${rutaId}/estado`, {
-        slate: nuevoEstado
+        estado: nuevoEstado
       });
       setRuta(updated);
     } catch (err: unknown) {
@@ -349,6 +371,32 @@ export default function DetalleRutaPage() {
                   </p>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Mapa Card */}
+          <Card className="border border-border/50 bg-card shadow-lg overflow-hidden flex flex-col h-[500px]">
+            <CardHeader className="border-b border-border/30 bg-muted/10 p-4 shrink-0">
+              <CardTitle className="text-base font-bold flex items-center gap-2">
+                <Map className="w-5 h-5 text-primary" />
+                Mapa de Ruta
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 flex-1 relative min-h-[400px]">
+              <RouteMap 
+                origen={mapData?.origen}
+                destino={mapData?.destino}
+                puntosIntermedios={mapData?.puntos_intermedios}
+                geometria={mapData?.geometria_ruta}
+                isLoading={mapLoading}
+                errorMsg={mapData?._advertencias ? mapData._advertencias.join('. ') : null}
+              />
+              {mapData && mapData.distancia_km && (
+                <div className="absolute bottom-4 right-4 z-[400] bg-background/90 backdrop-blur-sm border border-border px-3 py-2 rounded-lg shadow-lg flex gap-4 text-xs font-medium">
+                  <div><span className="text-muted-foreground">Distancia:</span> {mapData.distancia_km} km</div>
+                  <div><span className="text-muted-foreground">Tiempo est.:</span> {mapData.duracion_estimada_min} min</div>
+                </div>
+              )}
             </CardContent>
           </Card>
 

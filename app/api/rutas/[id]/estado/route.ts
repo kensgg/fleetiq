@@ -37,10 +37,12 @@ export const PATCH = withRole(...ROLES_ESTADO)(async ({ request, params, user })
   try {
     const { id } = await params;
     const body = await request.json();
+    console.log('[DEBUG] /api/rutas/[id]/estado received body:', body);
 
     // Validación de entrada
     const result = updateEstadoRutaSchema.safeParse(body);
     if (!result.success) {
+      console.log('[DEBUG] Validation failed:', result.error.flatten().fieldErrors);
       return errorResponse('Datos inválidos', 422, result.error.flatten().fieldErrors);
     }
 

@@ -11,6 +11,9 @@ import { apiClient, ApiClientError } from '@/lib/api/client';
 import type { Camion } from '@/modules/vehiculos/types';
 import type { Conductor } from '@/modules/conductores/types';
 import type { PuntoIntermedio } from '@/modules/rutas/types';
+import dynamic from 'next/dynamic';
+
+const RouteMap = dynamic(() => import('@/components/map/RouteMap'), { ssr: false });
 
 interface CamionesResponse {
   items: Camion[];
@@ -70,6 +73,11 @@ export default function NuevaRutaPage() {
     mensaje: string;
   } | null>(null);
 
+  // Estado del mapa
+  const [mapData, setMapData] = useState<any>(null);
+  const [isMapLoading, setIsMapLoading] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+
   // 1. Proteger ruta: Administradores, gerente_operaciones y supervisor pueden crear rutas
   useEffect(() => {
     if (!userLoading && (!user || !['administrador', 'gerente_operaciones', 'supervisor'].includes(user.rol))) {
@@ -96,10 +104,15 @@ export default function NuevaRutaPage() {
       ])
         .then(([camionesRes, conductoresRes, rutasRes]) => {
           if (active) {
-            setCamiones(camionesRes.items || []);
-
-            // Filtrar conductores que ya tengan una ruta en curso (cliente-side validation)
+            // Filtrar camiones y conductores que ya tengan una ruta en curso
             const activeConductorIds = (rutasRes.items || []).map(r => r.conductor_id);
+            const activeCamionIds = (rutasRes.items || []).map(r => r.camion_id);
+
+            const camionesLibres = (camionesRes.items || []).filter(
+              c => !activeCamionIds.includes(c.id)
+            );
+            setCamiones(camionesLibres);
+
             const conductoresLibres = (conductoresRes.items || []).filter(
               c => !activeConductorIds.includes(c.id)
             );
@@ -128,6 +141,41 @@ export default function NuevaRutaPage() {
       </div>
     );
   }
+
+  const handlePreviewMap = async () => {
+    if (!origen || !destino) {
+      setMapError('Debes ingresar al menos el origen y el destino para previsualizar.');
+      return;
+    }
+    
+    setIsMapLoading(true);
+    setMapError(null);
+    
+    try {
+      const paradas = puntos
+        .filter(p => p.nombre.trim() !== '')
+        .map(p => ({ nombre: p.nombre.trim() }));
+        
+      const res = await apiClient.post<any>('/api/rutas/preview', {
+        origen: origen.trim(),
+        destino: destino.trim(),
+        puntos_intermedios: paradas
+      });
+      
+      setMapData(res);
+      if (res._advertencias && res._advertencias.length > 0) {
+        setMapError(res._advertencias.join('. '));
+      }
+    } catch (err: unknown) {
+      if (err instanceof ApiClientError) {
+        setMapError(err.message);
+      } else {
+        setMapError('Error desconocido al previsualizar la ruta.');
+      }
+    } finally {
+      setIsMapLoading(false);
+    }
+  };
 
   // Manejo de paradas intermedias
   const handleAddPunto = () => {
@@ -200,7 +248,7 @@ export default function NuevaRutaPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 max-w-6xl mx-auto">
       {/* Back button */}
       <Link
         href="/dashboard/rutas"
@@ -249,8 +297,9 @@ export default function NuevaRutaPage() {
         </Card>
       ) : (
         /* Formulario normal */
-        <Card className="border border-border/50 bg-card shadow-xl overflow-hidden">
-          <CardHeader className="border-b border-border/30 bg-muted/10 p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="border border-border/50 bg-card shadow-xl overflow-hidden">
+            <CardHeader className="border-b border-border/30 bg-muted/10 p-6">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
                 <Map className="w-5 h-5" />
@@ -438,6 +487,19 @@ export default function NuevaRutaPage() {
                 )}
               </div>
 
+              <div className="pt-4 flex justify-end">
+                <Button 
+                  type="button" 
+                  variant="secondary" 
+                  onClick={handlePreviewMap}
+                  disabled={isMapLoading || !origen || !destino}
+                  className="rounded-xl font-medium"
+                >
+                  <Map className="w-4 h-4 mr-2" />
+                  Previsualizar Ruta en Mapa
+                </Button>
+              </div>
+
               {/* Action buttons */}
               <div className="pt-4 border-t border-border/30 flex justify-end gap-3">
                 <Button
@@ -467,6 +529,35 @@ export default function NuevaRutaPage() {
             </form>
           </CardContent>
         </Card>
+
+        {/* Mapa de Vista Previa */}
+        <div className="flex flex-col h-[500px] lg:h-auto sticky top-6">
+          <Card className="border border-border/50 bg-card shadow-xl overflow-hidden h-full flex flex-col">
+            <CardHeader className="border-b border-border/30 bg-muted/10 p-4 shrink-0">
+              <CardTitle className="text-lg font-bold flex items-center gap-2">
+                <Map className="w-5 h-5 text-primary" />
+                Vista Previa de Ruta
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 flex-1 relative min-h-[400px]">
+              <RouteMap 
+                origen={mapData?.origen}
+                destino={mapData?.destino}
+                puntosIntermedios={mapData?.puntos_intermedios}
+                geometria={mapData?.geometria_ruta}
+                isLoading={isMapLoading}
+                errorMsg={mapError}
+              />
+              {mapData && mapData.distancia_km && (
+                <div className="absolute bottom-4 right-4 z-[400] bg-background/90 backdrop-blur-sm border border-border px-3 py-2 rounded-lg shadow-lg flex gap-4 text-xs font-medium">
+                  <div><span className="text-muted-foreground">Distancia:</span> {mapData.distancia_km} km</div>
+                  <div><span className="text-muted-foreground">Tiempo est.:</span> {mapData.duracion_estimada_min} min</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        </div>
       )}
     </div>
   );
